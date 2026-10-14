@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Presupuesto Quirúrgico</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+    
+    <style>
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .budget-table th {
+            background: #f8fafc;
+            color: #0f172a;
+            font-weight: 700;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        .budget-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .budget-table input {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            width: 100%;
+        }
+
+        .budget-total-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 18px;
+        }
+
+        .budget-total-amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #0284c7;
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Presupuesto Quirúrgico</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="pqPatientSelect" title="Cargar datos de la paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearPQ" title="Limpiar presupuesto">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadPQPDF" title="Descargar cotización oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSavePQ" title="Guardar presupuesto">
+                    <i class="fas fa-floppy-disk"></i> Guardar Presupuesto
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL DE PRESUPUESTO QUIRÚRGICO (1 PÁGINA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printablePQSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+            <div class="letterhead-elegant-wrapper">
+                <div class="letterhead-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                    <div class="letterhead-doctor-info">
+                        <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                        <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                        <div class="letterhead-doc-contact-inline">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="letterhead-doc-badge-box">
+                    <div class="letterhead-doc-badge" id="pqDocTitleBadge">PRESUPUESTO QUIRÚRGICO</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Presupuesto -->
+        <form id="formPresupuestoQuirurgico">
+            
+            <!-- Datos de la Paciente y Cirugía -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Datos de la Paciente y Procedimiento Propuesto</span>
+                    </h3>
+                    <span class="badge-tag badge-tag-green">Cirugía</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Nombre y Apellido de la Paciente *</label>
+                        <input type="text" id="pqNombre" required placeholder="Nombre completo">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Cédula de Identidad *</label>
+                        <input type="text" id="pqCedula" required placeholder="V-00.000.000">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Fecha de Emisión *</label>
+                        <input type="date" id="pqFecha" required>
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label>Procedimiento Quirúrgico Propuesto *</label>
+                        <select id="pqProcedimientoSelect">
+                            <option value="Cesárea Segmentaria + Salpingoclasia (Esterilización)">Cesárea Segmentaria + Salpingoclasia (Esterilización)</option>
+                            <option value="Parto Eutócico Simple Humanizado">Parto Eutócico Simple Humanizado</option>
+                            <option value="Histerectomía Abdominal Total">Histerectomía Abdominal Total</option>
+                            <option value="Histerectomía Laparoscópica">Histerectomía Laparoscópica</option>
+                            <option value="Miomectomía Uterina">Miomectomía Uterina</option>
+                            <option value="Conización Cervical con Asa LEEP">Conización Cervical con Asa LEEP</option>
+                            <option value="Laparoscopia Ginecológica / Quistectomía Ovárica">Laparoscopia Ginecológica / Quistectomía Ovárica</option>
+                            <option value="Histeroscopia Quirúrgica / Polipectomía">Histeroscopia Quirúrgica / Polipectomía</option>
+                            <option value="Otro">Otro Procedimiento...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label>Centro Médico / Clínica Quirúrgica Sugerida:</label>
+                        <input type="text" id="pqClinica" placeholder="Nombre de la clínica / Centro médico quirúrgico">
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label>Detalle / Diagnóstico Quirúrgico:</label>
+                        <input type="text" id="pqDiagnostico" placeholder="Diagnóstico que justifica la intervención quirúrgica">
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label>Fecha Programada de Cirugía / Programación Quirúrgica:</label>
+                        <div style="display: flex; gap: 8px; align-items: center; max-width: 480px;">
+                            <input type="date" id="pqFechaCirugia">
+                            <button type="button" class="btn-wa-reminder-pill no-print" id="btnWaCirugiaReminder" title="Enviar programación quirúrgica por WhatsApp">
+                                <i class="fab fa-whatsapp"></i> Programar por WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Desglose de Costos de Equipo Quirúrgico -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Desglose de Honorarios Médicos y Gastos</span>
+                    </h3>
+                </div>
+
+                <table class="budget-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">Concepto / Especialista</th>
+                            <th style="width: 25%;">Rol</th>
+                            <th style="width: 25%; text-align: right;">Monto (USD $)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Dr. Christian A. Rodriguez C.</strong></td>
+                            <td>Cirujano Principal (Ginecólogo Obstetra)</td>
+                            <td><input type="number" class="budget-input" id="costCirujano" value="600" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Médico Primer Ayudante</strong></td>
+                            <td>Primer Ayudante Quirúrgico</td>
+                            <td><input type="number" class="budget-input" id="costAyudante" value="150" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Médico Anestesiólogo</strong></td>
+                            <td>Especialista en Anestesiología</td>
+                            <td><input type="number" class="budget-input" id="costAnestesiologo" value="200" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Médico Pediatra / Neonatólogo</strong></td>
+                            <td>Atención Inmediata al Recién Nacido</td>
+                            <td><input type="number" class="budget-input" id="costPediatra" value="150" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Instrumentista Quirúrgico</strong></td>
+                            <td>Licenciado en Instrumentación</td>
+                            <td><input type="number" class="budget-input" id="costInstrumentista" value="80" style="text-align: right;"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gastos Clínicos Estimados / Quirófano</strong></td>
+                            <td>Sala de operaciones, recuperación y materiales</td>
+                            <td><input type="number" class="budget-input" id="costClinica" value="450" style="text-align: right;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="budget-total-box">
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: 700; color: #166534; text-transform: uppercase;">Monto Total Presupuestado:</div>
+                        <div style="font-size: 0.8rem; color: #475569;">Honorarios de equipo quirúrgico completo y clínica</div>
+                    </div>
+                    <div class="budget-total-amount" id="budgetTotalLabel">$1,630.00 USD</div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 20px;">
+                    <div class="form-field col-4">
+                        <label>Validez del Presupuesto:</label>
+                        <input type="text" id="pqValidez" value="15 Días continuos">
+                    </div>
+                    <div class="form-field col-8">
+                        <label>Condiciones de Pago y Exclusiones:</label>
+                        <input type="text" id="pqCondiciones" value="Pago previo a la intervención. No incluye complicaciones imprevistas ni días adicionales de UCI.">
+                    </div>
+                    <div class="form-field col-12">
+                        <label>Estudios Preoperatorios Obligatorios:</label>
+                        <input type="text" id="pqPreoperatorios" value="Perfil preoperatorio (Hematología, TP, TTP, Glicemia, VIH, VDRL), Valoración Cardiovascular y Rx Tórax.">
+                    </div>
+                </div>
+            </section>
+
+        </form>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+
+        </div> <!-- Fin de #printablePQSheet -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/presupuesto_quirurgico.js?v=7.0"></script>
+</body>
+
+</html>

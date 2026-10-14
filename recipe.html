@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Récipe Médico e Indicaciones</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+    
+    <style>
+        .prescription-split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .prescription-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .prescription-box h3 {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .med-item-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .med-item-card:hover {
+            border-color: #cbd5e1;
+            background: #ffffff;
+        }
+
+        .btn-remove-med {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 860px) {
+            .prescription-split-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            .prescription-split-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 16px !important;
+            }
+            .prescription-box {
+                border: 1px solid #cbd5e1 !important;
+                padding: 12px !important;
+            }
+            .btn-remove-med, .btn-add-med-pill {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Récipe Médico</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="recipePatientSelect" title="Cargar datos de paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearRecipe" title="Limpiar récipe">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadRecipePDF" title="Descargar récipe oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveRecipe" title="Guardar récipe médico">
+                    <i class="fas fa-floppy-disk"></i> Guardar Récipe
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL DE RÉCIPE E INDICACIONES (1 PÁGINA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableRecipeSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+            <div class="letterhead-elegant-wrapper">
+                <div class="letterhead-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                    <div class="letterhead-doctor-info">
+                        <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                        <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                        <div class="letterhead-doc-contact-inline">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="letterhead-doc-badge-box">
+                    <div class="letterhead-doc-badge" id="recDocTitleBadge">RÉCIPE E INDICACIONES MÉDICAS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos Rápidos de la Paciente -->
+        <section class="clinical-card fade-in-up" style="padding: 20px 24px; margin-bottom: 20px;">
+            <div class="form-grid">
+                <div class="form-field col-5">
+                    <label>Nombre de la Paciente *</label>
+                    <input type="text" id="recNombre" placeholder="Nombre completo" required>
+                </div>
+                <div class="form-field col-3">
+                    <label>Cédula de Identidad *</label>
+                    <input type="text" id="recCedula" placeholder="V-00.000.000" required>
+                </div>
+                <div class="form-field col-2">
+                    <label>Edad</label>
+                    <input type="number" id="recEdad" placeholder="Años">
+                </div>
+                <div class="form-field col-2">
+                    <label>Fecha de Emisión</label>
+                    <input type="date" id="recFecha">
+                </div>
+                <div class="form-field col-12">
+                    <label>Diagnóstico / Condición Clínica</label>
+                    <input type="text" id="recDiag" placeholder="Ej: Gestación de 28 semanas / Infección del tracto urinario baja / Control prenatal">
+                </div>
+            </div>
+        </section>
+
+        <!-- Cuadrícula Doble: RP (Farmacia) e INDICACIONES (Paciente) -->
+        <div class="prescription-split-grid fade-in-up">
+            
+            <!-- PANEL 1: RP MÉDICO (RECETA) -->
+            <div class="prescription-box">
+                <h3>
+                    <span>RP: Tratamiento Farmacológico</span>
+                </h3>
+
+                <div id="medListContainer">
+                    <!-- Medicamento 1 por defecto -->
+                    <div class="med-item-card">
+                        <button type="button" class="btn-remove-med" onclick="removeMedCard(this)" title="Eliminar">&times;</button>
+                        <div class="form-grid">
+                            <div class="form-field col-8">
+                                <label>Fármaco / Principio Activo</label>
+                                <input type="text" class="med-nombre" list="vademecumList" placeholder="Ej: Sulfato Ferroso + Ácido Fólico">
+                            </div>
+                            <div class="form-field col-4">
+                                <label>Presentación</label>
+                                <input type="text" class="med-presentacion" placeholder="Tab 200mg / Ampollas">
+                            </div>
+                            <div class="form-field col-6">
+                                <label>Cantidad / Unidades</label>
+                                <input type="text" class="med-cantidad" placeholder="Caja #1 (30 tabletas)">
+                            </div>
+                            <div class="form-field col-6">
+                                <label>Vía de Administración</label>
+                                <input type="text" class="med-via" placeholder="Vía Oral / Intramuscular">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datalist para autocompletado desde vademécum local -->
+                <datalist id="vademecumList"></datalist>
+
+                <button type="button" class="btn-action btn-action-secondary btn-add-med-pill no-print" id="btnAddMed" style="width: 100%; justify-content: center; margin-top: 10px;">
+                    <i class="fas fa-plus"></i> Agregar Otro Medicamento
+                </button>
+            </div>
+
+            <!-- PANEL 2: INDICACIONES Y POSOLOGÍA -->
+            <div class="prescription-box">
+                <h3>
+                    <span>Indicaciones de Administración</span>
+                </h3>
+
+                <div class="form-field col-12" style="margin-bottom: 14px;">
+                    <label>Posología y Horarios para la Paciente:</label>
+                    <textarea id="recIndicaciones" rows="8" placeholder="1. Tomar 1 tableta cada 24 horas con abundante agua en las mañanas, preferiblemente alejado de lácteos.&#10;2. Continuar por 30 días continuos.&#10;3. Mantener hidratación abundante (mínimo 2.5 litros de agua al día)."></textarea>
+                </div>
+
+                <div class="form-field col-12">
+                    <label>Recomendaciones Adicionales y Signos de Alerta:</label>
+                    <textarea id="recRecomendaciones" rows="4" placeholder="Reposo relativo, evitar esfuerzos físicos excesivos. Comunicarse con el consultorio ante cualquier síntoma inusual o acudir a urgencias."></textarea>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+
+        </div> <!-- Fin de #printableRecipeSheet -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/recipe.js?v=7.0"></script>
+</body>
+
+</html>

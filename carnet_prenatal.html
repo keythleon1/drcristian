@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Carnet de Control Prenatal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sniglet:wght@800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+    
+    <style>
+        /* Estilos depurados y minimalistas para el Carnet de Control Prenatal */
+        .prenatal-booklet-body {
+            background-color: #f8fafc;
+        }
+
+        .booklet-container {
+            max-width: 960px;
+            margin: 16px auto 36px auto;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .booklet-cover {
+            background: #ffffff;
+            padding: 36px 30px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .cover-title-bubble {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #9f1239;
+            letter-spacing: 0.5px;
+            margin: 12px 0 6px 0;
+            text-transform: uppercase;
+            text-shadow: none;
+        }
+
+        .cover-subtitle {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .cover-patient-meta {
+            margin: 16px auto;
+            max-width: 460px;
+            text-align: left;
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .cover-circle-logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 3px solid #be123c;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(190, 18, 60, 0.1);
+        }
+
+        .cover-circle-logo .logo-rc {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #0284c7;
+            font-style: italic;
+            line-height: 1;
+        }
+
+        .cover-circle-logo .logo-name {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .cover-banner-bottom {
+            background: #9f1239;
+            color: #ffffff;
+            padding: 14px 20px;
+            border-radius: 8px;
+            margin-top: 24px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            line-height: 1.5;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .booklet-nav-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 6px;
+            margin: 16px 20px 0 20px;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        .booklet-tab-btn {
+            background: transparent;
+            border: none;
+            padding: 9px 16px;
+            font-weight: 600;
+            font-size: 0.86rem;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .booklet-tab-btn:hover {
+            color: #0f172a;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .booklet-tab-btn.active {
+            color: #9f1239;
+            background: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .booklet-page {
+            display: none;
+            padding: 24px;
+        }
+
+        .booklet-page.active-page {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .booklet-header-bar {
+            background: #9f1239;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .booklet-header-bar h2 {
+            font-size: 0.98rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .special-box-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .special-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .special-box-header {
+            background: #f8fafc;
+            color: #0f172a;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .special-box-body {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .recommendation-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.88rem;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .recommendation-list .rec-num {
+            background: #ffe4e6;
+            color: #be123c;
+            font-weight: 700;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        @media print {
+            .booklet-nav-tabs,
+            .top-action-bar,
+            .dashboard-header,
+            .no-print {
+                display: none !important;
+            }
+            .booklet-container {
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            .booklet-page {
+                display: block !important;
+                page-break-after: always;
+                padding: 15px 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="prenatal-booklet-body">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="historia_clinica.html" class="btn-action btn-action-secondary" title="Volver a la Historia Clínica">
+                <i class="fas fa-arrow-left"></i> Historia Clínica
+            </a>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-home"></i> Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra de Herramientas Superior -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="historia_clinica.html">Historia Clínica</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Carnet de Control Prenatal</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="selectPrenatalPatient" title="Cargar datos de la paciente">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-primary" id="btnDownloadBookletPDF" title="Descargar carnet oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveBooklet" title="Guardar cambios del carnet">
+                    <i class="fas fa-floppy-disk"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             CONTENEDOR DE LA CARTILLA PRENATAL
+             ============================================================== -->
+        <div class="booklet-container fade-in-up">
+            
+            <!-- Pestañas de Navegación de Páginas de la Cartilla -->
+            <div class="booklet-nav-tabs no-print">
+                <button type="button" class="booklet-tab-btn active" data-target="page-cover">
+                    <i class="fas fa-book-open"></i> Portada
+                </button>
+                <button type="button" class="booklet-tab-btn" data-target="page-p1">
+                    <i class="fas fa-id-card"></i> Pág 1: Datos y Ecos
+                </button>
+                <button type="button" class="booklet-tab-btn" data-target="page-p2">
+                    <i class="fas fa-table-list"></i> Pág 2: Consultas y Labs
+                </button>
+                <button type="button" class="booklet-tab-btn" data-target="page-back">
+                    <i class="fas fa-heart-pulse"></i> Contraportada: Pautas y Citas
+                </button>
+            </div>
+
+            <!-- ==========================================================
+                 PÁGINA 1: PORTADA
+                 ========================================================== -->
+            <div class="booklet-page active-page" id="page-cover">
+                <div class="booklet-cover">
+                    
+                    <h1 class="cover-title-bubble">Control Prenatal</h1>
+                    <div class="cover-subtitle">Cartilla Oficial de Seguimiento Gestacional &bull; Dr. Christian A. Rodríguez C.</div>
+
+                    <div class="cover-patient-meta">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                            <strong style="color: #0f172a; min-width: 60px; font-size: 0.88rem;">PACIENTE:</strong>
+                            <input type="text" id="coverDe" placeholder="Nombre completo de la gestante" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; width: 100%; font-weight: 700; font-size: 0.95rem; background: #ffffff;">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong style="color: #0f172a; min-width: 60px; font-size: 0.88rem;">F.P.P.:</strong>
+                            <input type="date" id="coverFPP" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; width: 100%; font-weight: 700; color: #be123c; background: #ffffff;">
+                        </div>
+                    </div>
+
+                    <!-- Logo Circular RC del Dr. Rodriguez -->
+                    <div class="cover-circle-logo">
+                        <div class="logo-rc">RC</div>
+                        <div class="logo-name">DR. CHRISTIAN A.</div>
+                        <div class="logo-name" style="margin-top: 0;">RODRIGUEZ C.</div>
+                    </div>
+
+                    <div class="cover-banner-bottom">
+                        <div>Ginecólogo Obstetra &bull; Diplomado Materno Fetal</div>
+                        <div>Ecografía y Cirugías Ginecológicas y Obstétricas</div>
+                        <div>Planificación Familiar &bull; Control Prenatal Especializado</div>
+                        <div style="font-size: 0.76rem; opacity: 0.9; margin-top: 4px;">Despistaje de Cáncer Ginecológico</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ==========================================================
+                 PÁGINA 2: DATOS PERSONALES, ANTECEDENTES Y ECOS (FOTO 3)
+                 ========================================================== -->
+            <div class="booklet-page" id="page-p1">
+                <div class="booklet-header-bar">
+                    <h2>CONTROL PRENATAL &bull; DR. CHRISTIAN A. RODRIGUEZ C.</h2>
+                </div>
+
+                <!-- Datos Personales -->
+                <div style="border-bottom: 1.5px solid #fbcfe8; padding-bottom: 14px; margin-bottom: 16px;">
+                    <h4 style="color: #db2777; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px;">DATOS PERSONALES</h4>
+                    <div class="form-grid">
+                        <div class="form-field col-6">
+                            <label>Nombre y Apellido:</label>
+                            <input type="text" id="bNombre">
+                        </div>
+                        <div class="form-field col-2">
+                            <label>Edad:</label>
+                            <input type="number" id="bEdad">
+                        </div>
+                        <div class="form-field col-2">
+                            <label>Fn (Fecha Nac):</label>
+                            <input type="date" id="bFn">
+                        </div>
+                        <div class="form-field col-2">
+                            <label>Cédula:</label>
+                            <input type="text" id="bCedula">
+                        </div>
+                        <div class="form-field col-3">
+                            <label>Lugar:</label>
+                            <input type="text" id="bLugar">
+                        </div>
+                        <div class="form-field col-2">
+                            <label>Peso (kg):</label>
+                            <input type="number" step="0.1" id="bPeso">
+                        </div>
+                        <div class="form-field col-2">
+                            <label>Talla (m):</label>
+                            <input type="number" step="0.01" id="bTalla">
+                        </div>
+                        <div class="form-field col-2">
+                            <label>IMC:</label>
+                            <input type="text" id="bIMC" readonly>
+                        </div>
+                        <div class="form-field col-3">
+                            <label>Captación:</label>
+                            <input type="date" id="bCaptacion">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Antecedentes Gineco-Obstétricos -->
+                <div style="border-bottom: 1.5px solid #fbcfe8; padding-bottom: 14px; margin-bottom: 16px;">
+                    <h4 style="color: #db2777; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px;">ANTECEDENTES GINECOLÓGICOS Y OBSTÉTRICOS</h4>
+                    <div class="form-grid">
+                        <div class="form-field col-2"><label>Menarquia:</label><input type="text" id="bMenarquia"></div>
+                        <div class="form-field col-2"><label>Parejas:</label><input type="text" id="bParejas"></div>
+                        <div class="form-field col-2"><label>DIU:</label><input type="text" id="bDIU"></div>
+                        <div class="form-field col-2"><label>ACO:</label><input type="text" id="bACO"></div>
+                        <div class="form-field col-2"><label>INTRAD:</label><input type="text" id="bIntrad"></div>
+                        <div class="form-field col-2"><label>ITS:</label><input type="text" id="bITS"></div>
+                        <div class="form-field col-3"><label>FUR:</label><input type="date" id="bFUR"></div>
+                        <div class="form-field col-3"><label>Ciclo / Tipo:</label><input type="text" id="bCiclo"></div>
+                        <div class="form-field col-6"><label>A.O (Gesta/Partos/Ces/Abortos):</label><input type="text" id="bAO" placeholder="G: P: C: A:"></div>
+                    </div>
+                </div>
+
+                <!-- Cuadros Especiales: Ecos Especializados y Pruebas Especiales (Foto 3) -->
+                <div class="special-box-grid">
+                    <div class="special-box">
+                        <div class="special-box-header">ECOS ESPECIALIZADOS</div>
+                        <div class="special-box-body">
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Eco Genético I (Sem 11 - 13):</label>
+                                <input type="text" id="bEcoGen1" placeholder="Fecha y hallazgos">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Eco Genético II (Sem 18 - 22):</label>
+                                <input type="text" id="bEcoGen2" placeholder="Fecha y hallazgos">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Ecocardiograma fetal (Sem 24-28):</label>
+                                <input type="text" id="bEcoCardio" placeholder="Resultado">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Eco doppler:</label>
+                                <input type="text" id="bEcoDoppler" placeholder="Flujometría materno-fetal">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="special-box">
+                        <div class="special-box-header">PRUEBAS ESPECIALES</div>
+                        <div class="special-box-body">
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Test Toxoplasmosis:</label>
+                                <input type="text" id="bTestToxo" placeholder="Resultado">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Despistaje D.M (24 - 28 sem):</label>
+                                <input type="text" id="bTestDM" placeholder="Sobrecarga glucosa">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Cultivo S.bgrupo B (34-36 sem):</label>
+                                <input type="text" id="bTestStrepto" placeholder="Resultado hisopado">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:700;">Urocultivo:</label>
+                                <input type="text" id="bTestUro" placeholder="Resultado">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Inductores MPF:</label>
+                        <input type="text" id="bInductores" placeholder="Dosis y esquema de fechas">
+                    </div>
+                    <div class="form-field col-6">
+                        <label>Tratamiento Prescrito:</label>
+                        <input type="text" id="bTratamiento" placeholder="Hierro, Ácido fólico, Calcio...">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ==========================================================
+                 PÁGINA 3: TABLAS DE CONSULTA, LABS Y ECOS (FOTO 5)
+                 ========================================================== -->
+            <div class="booklet-page" id="page-p2">
+                <div class="booklet-header-bar">
+                    <h2>CONTROL PRENATAL &bull; REGISTRO CLÍNICO Y SEGUIMIENTO</h2>
+                </div>
+
+                <!-- Tabla Consulta -->
+                <div class="prenatal-table-box" style="margin-bottom: 20px;">
+                    <div class="prenatal-table-header">
+                        <h4>CONSULTA</h4>
+                    </div>
+                    <div class="prenatal-table-responsive">
+                        <table class="table-prenatal-grid">
+                            <thead>
+                                <tr>
+                                    <th>FECHA</th><th>PESO</th><th>T.A</th><th>F.C</th><th>TEMP</th><th>SpO2</th><th>A.U</th><th>FCF</th><th>PRESENTACIÓN</th><th>EDEMA</th><th>ORINA</th><th>E.G</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabla Laboratorio -->
+                <div class="prenatal-table-box" style="margin-bottom: 20px;">
+                    <div class="prenatal-table-header" style="background: linear-gradient(90deg, #be123c 0%, #d81b60 100%);">
+                        <h4>LABORATORIO</h4>
+                    </div>
+                    <div class="prenatal-table-responsive">
+                        <table class="table-prenatal-grid">
+                            <thead>
+                                <tr>
+                                    <th>FECHA</th><th>HgB</th><th>Hto</th><th>LEUCO</th><th>PLAQ</th><th>VDRL</th><th>HIV</th><th>GliCe</th><th>UREA</th><th>Creat.</th><th>ORINA</th><th>OTROS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabla Ecosonogramas -->
+                <div class="prenatal-table-box">
+                    <div class="prenatal-table-header" style="background: linear-gradient(90deg, #7c3aed 0%, #db2777 100%);">
+                        <h4>ECOSONOGRAMAS</h4>
+                    </div>
+                    <div class="prenatal-table-responsive">
+                        <table class="table-prenatal-grid">
+                            <thead>
+                                <tr>
+                                    <th>FECHA</th><th>DBP</th><th>C.C</th><th>C.A</th><th>L.F</th><th>PLACENTA</th><th>INTEST.</th><th>L.A</th><th>TALLA</th><th>PESO</th><th>PERFIL BIOFÍSICO</th><th>E.G.E</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                                <tr><td><input type="text" placeholder="DD/MM"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ==========================================================
+                 PÁGINA 4: CONTRAPORTADA: EVOLUCIÓN, 11 RECOMENDACIONES Y CITAS (FOTO 1 & 4)
+                 ========================================================== -->
+            <div class="booklet-page" id="page-back">
+                <div class="booklet-header-bar">
+                    <h2>CONTROL PRENATAL &bull; DR. CHRISTIAN A. RODRIGUEZ C.</h2>
+                </div>
+
+                <!-- Evolución -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #db2777; font-weight: 800; text-transform: uppercase; margin-bottom: 6px;">EVOLUCIÓN:</h4>
+                    <textarea id="bEvolucion" rows="4" style="width: 100%; border: 1.5px solid #fbcfe8; background: #fffdfd; border-radius: 8px; padding: 10px;" placeholder="Líneas de evolución clínica..."></textarea>
+                </div>
+
+                <!-- 11 Recomendaciones Oficiales del Doctor (Foto 1) -->
+                <div style="background: #fff0f5; padding: 18px; border-radius: 12px; border: 1.5px solid #fbcfe8;">
+                    <h4 style="color: #be123c; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">RECOMENDACIONES:</h4>
+                    <ul class="recommendation-list">
+                        <li><span class="rec-num">1</span> <span>Tomar abundante líquido, no aguantar ganas de orinar.</span></li>
+                        <li><span class="rec-num">2</span> <span>Hacer ejercicio o yoga prenatal adaptado a su condición obstétrica.</span></li>
+                        <li><span class="rec-num">3</span> <span>Comer bajo en sal y nada de grasas.</span></li>
+                        <li><span class="rec-num">4</span> <span>Aumentar ingesta de frutas, verduras y vegetales.</span></li>
+                        <li><span class="rec-num">5</span> <span>Caminar de 10 a 30 min al día a la misma hora, previo calentamiento y estiramiento.</span></li>
+                        <li><span class="rec-num">6</span> <span>Acudir al control prenatal sucesivamente, para disminuir los riesgos obstétricos.</span></li>
+                        <li><span class="rec-num">7</span> <span>Dormir 3 a 4 horas en el día y 8 a 12 horas durante la noche.</span></li>
+                        <li><span class="rec-num">8</span> <span>Hablarle al bebé dentro del vientre, hablarle de Dios y leerle textos bíblicos.</span></li>
+                        <li><span class="rec-num">9</span> <span>Colocar música relajante ayudará al desarrollo físico y mental de tu futuro bebé.</span></li>
+                        <li><span class="rec-num">10</span> <span><strong>¡En caso de sangrado vaginal, pérdida de líquido vía vaginal o disminución de movimientos fetales, cefalea, visión borrosa, piticos en los oídos, cambio de coloración y temperatura en las orejas, dolor en la boca del estómago, medir T.A y avisar!</strong></span></li>
+                        <li><span class="rec-num">11</span> <span>Comunícate con tu ginecólogo obstetra en caso de emergencia al <strong>0414-5860575</strong> o <strong>0412-4770492</strong>.</span></li>
+                    </ul>
+                </div>
+
+                <!-- Próxima Cita (Foto 1) -->
+                <div style="margin-top: 24px;">
+                    <div style="background: #db2777; color: #ffffff; padding: 10px 16px; border-radius: 8px 8px 0 0; font-weight: 800; text-transform: uppercase; text-align: center; letter-spacing: 1px;">
+                        PRÓXIMA CITA:
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #db2777;">
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #fbcfe8; padding: 10px; width: 33.3%;"><input type="date" style="width: 100%; font-weight: 700;"></td>
+                                <td style="border: 1px solid #fbcfe8; padding: 10px; width: 33.3%;"><input type="date" style="width: 100%; font-weight: 700;"></td>
+                                <td style="border: 1px solid #fbcfe8; padding: 10px; width: 33.3%;"><input type="date" style="width: 100%; font-weight: 700;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #fbcfe8; padding: 10px;"><input type="date" style="width: 100%; font-weight: 700;"></td>
+                                <td style="border: 1px solid #fbcfe8; padding: 10px;"><input type="date" style="width: 100%; font-weight: 700;"></td>
+                                <td style="border: 1px solid #fbcfe8; padding: 10px;"><input type="date" style="width: 100%; font-weight: 700;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/carnet_prenatal.js?v=7.0"></script>
+</body>
+
+</html>

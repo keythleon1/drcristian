@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Referencia Médica / Interconsulta</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Referencia Médica</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="refPatientSelect" title="Cargar datos de la paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearRef" title="Limpiar referencia">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadRefPDF" title="Descargar referencia oficial en PDF (Carta)">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveRef" title="Guardar referencia médica">
+                    <i class="fas fa-floppy-disk"></i> Guardar Referencia
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL (DISEÑADA PARA 1 SOLA PÁGINA CARTA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableRefSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+                <div class="letterhead-elegant-wrapper">
+                    <div class="letterhead-brand-left">
+                        <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                        <div class="letterhead-doctor-info">
+                            <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                            <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                            <div class="letterhead-doc-contact-inline">
+                                <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="letterhead-doc-badge-box">
+                        <div class="letterhead-doc-badge" id="refDocTitleBadge">REFERENCIA MÉDICA / INTERCONSULTA</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Referencia -->
+            <form id="formReferenciaMedica">
+                
+                <section class="clinical-card" style="box-shadow: none; border: 1px solid #e2e8f0; margin-bottom: 12px;">
+                    <div class="clinical-card-header">
+                        <h3 class="clinical-card-title">
+                            <span>Destino de la Referencia y Datos de la Paciente</span>
+                        </h3>
+                        <span class="badge-tag badge-tag-blue">Interconsulta</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field col-6">
+                            <label>Especialidad / Colega Destinatario *</label>
+                            <select id="refEspecialidad">
+                                <option value="Medicina Materno-Fetal / Perinatología">Medicina Materno-Fetal / Perinatología</option>
+                                <option value="Ginecología Oncológica / Mastología">Ginecología Oncológica / Mastología</option>
+                                <option value="Cardiología de Adultos / Fetal">Cardiología</option>
+                                <option value="Endocrinología y Nutrición">Endocrinología y Metabolismo</option>
+                                <option value="Urología Femenina">Urología Femenina</option>
+                                <option value="Genética Médica">Genética Médica</option>
+                                <option value="Hematología">Hematología</option>
+                                <option value="Otra Especialidad">Otra Especialidad...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field col-6">
+                            <label>Centro Hospitalario / Clínica Receptora:</label>
+                            <input type="text" id="refCentro" placeholder="Nombre del hospital o centro de salud">
+                        </div>
+
+                        <div class="form-field col-6">
+                            <label>Nombre y Apellido de la Paciente *</label>
+                            <input type="text" id="refNombre" required placeholder="Nombre de la paciente">
+                        </div>
+                        <div class="form-field col-3">
+                            <label>Cédula de Identidad *</label>
+                            <input type="text" id="refCedula" required placeholder="V-00.000.000">
+                        </div>
+                        <div class="form-field col-3">
+                            <label>Edad</label>
+                            <input type="number" id="refEdad" placeholder="Años">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label>Fecha de Emisión *</label>
+                            <input type="date" id="refFecha" required>
+                        </div>
+                        <div class="form-field col-8">
+                            <label>Motivo Específico de la Referencia *</label>
+                            <input type="text" id="refMotivo" required placeholder="Ej: Valoración perinatológica por sospecha de restricción de crecimiento intrauterino (RCIU)">
+                        </div>
+
+                        <div class="form-field col-12">
+                            <label>Resumen de Historia Clínica y Hallazgos Relevantes:</label>
+                            <textarea id="refResumen" rows="3" placeholder="Se remite a paciente femenina de edad indicada con diagnóstico de gestación..."></textarea>
+                        </div>
+
+                        <div class="form-field col-12">
+                            <label>Diagnóstico Clínico Presuntivo:</label>
+                            <input type="text" id="refDiagnostico" placeholder="1. Gestación simple activa de 34 semanas...">
+                        </div>
+
+                        <div class="form-field col-12">
+                            <label>Tratamiento Administrado y Sugerencias de Manejo Conjunto:</label>
+                            <textarea id="refTratamiento" rows="2" placeholder="Ácido acetilsalicílico 150mg/día, suplementación con calcio..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+            </form>
+
+            <!-- Pie de Documento con Firma -->
+            <div class="medical-doc-footer" style="justify-content: flex-end;">
+                <div class="signature-stamp-box">
+                    <div class="signature-line"></div>
+                    <div class="doc-stamp-title">Firma del Médico Tratante</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/referencia.js?v=7.0"></script>
+</body>
+
+</html>

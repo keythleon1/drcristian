@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Colposcopia: Montaje de Imágenes</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="informe_colposcopia.html" class="btn-action-util" title="Ir al Informe Colposcópico">
+                <i class="fas fa-file-medical"></i> Informe de Colposcopia
+            </a>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="informe_colposcopia.html">Colposcopia</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Montar Imágenes</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="colpoPhotoPatientSelect" title="Cargar datos de la paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearPhotos" title="Limpiar imágenes y descripciones">
+                    <i class="fas fa-eraser"></i> Limpiar Fotos
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadPhotosPDF" title="Descargar lámina fotográfica oficial en PDF (Carta)">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSavePhotos" title="Guardar lámina fotográfica">
+                    <i class="fas fa-floppy-disk"></i> Guardar Lámina
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL (DISEÑADA PARA 1 SOLA PÁGINA CARTA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableColpoPhotosSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+                <div class="letterhead-elegant-wrapper">
+                    <div class="letterhead-brand-left">
+                        <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                        <div class="letterhead-doctor-info">
+                            <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                            <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                            <div class="letterhead-doc-contact-inline">
+                                <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="letterhead-doc-badge-box">
+                        <div class="letterhead-doc-badge" id="colpoImgTitle">ANEXO FOTOGRÁFICO COLPOSCÓPICO</div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Datos de Identificación -->
+        <section class="clinical-card fade-in-up" style="padding: 18px 24px; margin-bottom: 20px;">
+            <div class="form-grid">
+                <div class="form-field col-6">
+                    <label>Nombre y Apellido de la Paciente *</label>
+                    <input type="text" id="cpNombre" placeholder="Nombre completo" required>
+                </div>
+                <div class="form-field col-3">
+                    <label>Cédula de Identidad *</label>
+                    <input type="text" id="cpCedula" placeholder="V-00.000.000" required>
+                </div>
+                <div class="form-field col-3">
+                    <label>Fecha del Estudio *</label>
+                    <input type="date" id="cpFecha" required>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cuadrícula de 4 Tomas Fotográficas -->
+        <div class="colpo-montage-container fade-in-up">
+            
+            <!-- FOTO 1: CÉRVIX SIMPLE -->
+            <div class="colpo-photo-box" id="boxPhoto1">
+                <span class="colpo-photo-title">1. Cérvix Simple (Visión Panorámica Inicial)</span>
+                <input type="file" id="filePhoto1" accept="image/*" class="no-print" style="margin-bottom: 10px;">
+                <img id="imgPreview1" class="colpo-photo-preview" src="" alt="Cérvix Inicial" style="display: none;">
+                <div class="colpo-clock-select">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Orientación / Horario:</label>
+                    <select id="clockPhoto1">
+                        <option value="Panorámica General">Panorámica General</option>
+                        <option value="Hora 12 (Labio Anterior)">Hora 12 (Labio Anterior)</option>
+                        <option value="Hora 6 (Labio Posterior)">Hora 6 (Labio Posterior)</option>
+                        <option value="Hora 3 (Comisura Izquierda)">Hora 3 (Comisura Izq)</option>
+                        <option value="Hora 9 (Comisura Derecha)">Hora 9 (Comisura Der)</option>
+                    </select>
+                </div>
+                <input type="text" id="descPhoto1" placeholder="Descripción: Cuello eutrófico, orificio cervical externo cerrado..." style="margin-top: 8px; font-size: 0.85rem;">
+            </div>
+
+            <!-- FOTO 2: ÁCIDO ACÉTICO -->
+            <div class="colpo-photo-box" id="boxPhoto2">
+                <span class="colpo-photo-title">2. Prueba de Ácido Acético al 3-5%</span>
+                <input type="file" id="filePhoto2" accept="image/*" class="no-print" style="margin-bottom: 10px;">
+                <img id="imgPreview2" class="colpo-photo-preview" src="" alt="Ácido Acético" style="display: none;">
+                <div class="colpo-clock-select">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Orientación / Horario:</label>
+                    <select id="clockPhoto2">
+                        <option value="Zona de Transformación">Zona de Transformación</option>
+                        <option value="Hora 12">Hora 12</option>
+                        <option value="Hora 6">Hora 6</option>
+                        <option value="Hora 3">Hora 3</option>
+                        <option value="Hora 9">Hora 9</option>
+                    </select>
+                </div>
+                <input type="text" id="descPhoto2" placeholder="Descripción: Reacción acetoblanca tenue / negativa / bordes netos..." style="margin-top: 8px; font-size: 0.85rem;">
+            </div>
+
+            <!-- FOTO 3: TEST DE SCHILLER (LUGOL) -->
+            <div class="colpo-photo-box" id="boxPhoto3">
+                <span class="colpo-photo-title">3. Test de Schiller (Solución de Lugol)</span>
+                <input type="file" id="filePhoto3" accept="image/*" class="no-print" style="margin-bottom: 10px;">
+                <img id="imgPreview3" class="colpo-photo-preview" src="" alt="Test de Schiller" style="display: none;">
+                <div class="colpo-clock-select">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Orientación / Horario:</label>
+                    <select id="clockPhoto3">
+                        <option value="Test Yodo Positivo">Yodopositivo Caoba (Normal)</option>
+                        <option value="Zona Yodonegativa Hora 12">Yodonegativa Hora 12</option>
+                        <option value="Zona Yodonegativa Hora 6">Yodonegativa Hora 6</option>
+                        <option value="Zona Yodonegativa Difusa">Yodonegativa Difusa</option>
+                    </select>
+                </div>
+                <input type="text" id="descPhoto3" placeholder="Descripción: Captación caoba homogénea normal / área yodonegativa mostaza..." style="margin-top: 8px; font-size: 0.85rem;">
+            </div>
+
+            <!-- FOTO 4: BIOPSIA / FILTRO VERDE -->
+            <div class="colpo-photo-box" id="boxPhoto4">
+                <span class="colpo-photo-title">4. Toma de Biopsia / Filtro Verde (Vasos)</span>
+                <input type="file" id="filePhoto4" accept="image/*" class="no-print" style="margin-bottom: 10px;">
+                <img id="imgPreview4" class="colpo-photo-preview" src="" alt="Biopsia o Filtro Verde" style="display: none;">
+                <div class="colpo-clock-select">
+                    <label style="font-size: 0.8rem; font-weight: 700;">Orientación / Horario:</label>
+                    <select id="clockPhoto4">
+                        <option value="Sin Biopsia / Filtro Verde Normal">Filtro Verde Normal</option>
+                        <option value="Biopsia Dirigida Hora 12">Biopsia Hora 12</option>
+                        <option value="Biopsia Dirigida Hora 6">Biopsia Hora 6</option>
+                        <option value="Biopsia Múltiple">Biopsia Múltiple</option>
+                    </select>
+                </div>
+                <input type="text" id="descPhoto4" placeholder="Descripción: Muestra remitida a histopatología / Vasos finos normales..." style="margin-top: 8px; font-size: 0.85rem;">
+            </div>
+
+        </div>
+
+        <!-- Conclusión Fotográfica Global -->
+        <section class="clinical-card fade-in-up" style="margin-top: 24px;">
+            <div class="clinical-card-header">
+                <h3 class="clinical-card-title">
+                    <span>Diagnóstico e Impresión del Estudio Fotográfico</span>
+                </h3>
+            </div>
+            <div class="form-field col-12">
+                <label>Conclusión Fotográfica y Conducta:</label>
+                <textarea id="cpConclusion" rows="3" placeholder="Fotodocumentación colposcópica compatible con cérvix eutrófico sin lesiones intraepiteliales sospechosas. Se sugiere control anual preventivo."></textarea>
+            </div>
+        </section>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/colposcopia_imagenes.js?v=7.0"></script>
+</body>
+
+</html>

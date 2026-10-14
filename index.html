@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Iniciar Sesión</title>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="login-split-body">
+
+    <div class="login-split-container">
+        
+        <!-- Panel Izquierdo: Azul Dinámico con Logo Blanco -->
+        <div class="split-left-panel">
+            <div class="ambient-orb orb-1"></div>
+            <div class="ambient-orb orb-2"></div>
+            <div class="ambient-orb orb-3"></div>
+
+            <div class="logo-hero-container">
+                <div class="logo-glow-wrapper">
+                    <img src="images/logo_white.png" alt="Lite Medic Logo" class="logo-white-img">
+                </div>
+                <div class="login-credits-glass">
+                    <i class="fas fa-brain"></i>
+                    <span>Desarrollado por <strong>Keyth Leon</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Formulario de Acceso Minimalista -->
+        <div class="split-right-panel">
+            <div class="auth-card">
+                
+                <div class="auth-header">
+                    <h1 class="auth-doctor-title">Dr. Christian A. Rodríguez C.</h1>
+                    <p class="auth-subtitle">Bienvenido Dr, a Lite+Medic, espero que hoy sea un excelente dia de consultas medicas.</p>
+                </div>
+
+                <!-- Alerta de Error -->
+                <div id="loginAlert" class="alert error" style="display: none;">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span id="alertMessage">Usuario o contraseña incorrectos.</span>
+                </div>
+
+                <!-- Formulario de Acceso -->
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="loginUser" class="form-label">Usuario</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon-box">
+                                <i class="fas fa-user input-icon"></i>
+                            </span>
+                            <input type="text" id="loginUser" placeholder="Nombre de usuario" required autocomplete="username" spellcheck="false" autofocus>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPass" class="form-label">Contraseña</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon-box">
+                                <i class="fas fa-lock input-icon"></i>
+                            </span>
+                            <input type="password" id="loginPass" placeholder="••••••••••••" required autocomplete="current-password">
+                            <button type="button" id="togglePassword" class="toggle-password" aria-label="Mostrar u ocultar contraseña" tabindex="-1">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div id="capsLockAlert" class="caps-hint" style="display: none;">
+                            <i class="fas fa-arrow-up"></i> Bloq Mayús activado
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <span>Iniciar Sesión</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script de autenticación -->
+    <script src="js/main.js?v=7.0"></script>
+</body>
+
+</html>

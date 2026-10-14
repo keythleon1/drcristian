@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Informe Médico Oficial</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Informe Médico</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="infPatientSelect" title="Cargar datos de la paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearReport" title="Limpiar informe">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadReportPDF" title="Descargar informe oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveReport" title="Guardar informe médico">
+                    <i class="fas fa-floppy-disk"></i> Guardar Informe
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL (DISEÑADA PARA 1 SOLA PÁGINA CARTA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableReportSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+            <div class="letterhead-elegant-wrapper">
+                <div class="letterhead-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                    <div class="letterhead-doctor-info">
+                        <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                        <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                        <div class="letterhead-doc-contact-inline">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="letterhead-doc-badge-box">
+                    <div class="letterhead-doc-badge" id="infDocTitleBadge">INFORME MÉDICO CLÍNICO</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario del Informe Médico -->
+        <form id="formMedicalReport">
+            
+            <!-- Datos de la Paciente -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Identificación de la Paciente</span>
+                    </h3>
+                    <span class="badge-tag badge-tag-blue">Datos</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Nombre y Apellido *</label>
+                        <input type="text" id="infNombre" required placeholder="Nombre completo de la paciente">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Cédula de Identidad *</label>
+                        <input type="text" id="infCedula" required placeholder="V-00.000.000">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Edad</label>
+                        <input type="number" id="infEdad" placeholder="Años">
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Fecha de Evaluación *</label>
+                        <input type="date" id="infFecha" required>
+                    </div>
+                    <div class="form-field col-8">
+                        <label>A Solicitud de / Dirigido a:</label>
+                        <input type="text" id="infDirigido" placeholder="A quien pueda interesar / Seguro Médico / Empleador">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resumen Clínico y Antecedentes -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Resumen Clínico y Motivo de Consulta</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label>Motivo de Consulta y Enfermedad Actual:</label>
+                        <textarea id="infEnfermedadActual" rows="3" placeholder="Se trata de paciente femenina de edad referida quien acude a consulta por presentar..."></textarea>
+                    </div>
+                    <div class="form-field col-12">
+                        <label>Antecedentes Gineco-Obstétricos y Personales de Relevancia:</label>
+                        <textarea id="infAntecedentes" rows="2" placeholder="Menarquia: 12 años, FUR: __/__/____, G: __ P: __ C: __ A: __. Sin antecedentes alérgicos ni quirúrgicos de importancia."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Examen Físico y Estudios Complementarios -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Hallazgos del Examen Físico y Paraclínicos</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label>Examen Físico Segmentario (Mamas, Abdomen y Genitales):</label>
+                        <textarea id="infExamenFisico" rows="3" placeholder="Paciente en regulares condiciones generales, afebril, hemodinámicamente estable. Mamas simétricas sin nódulos. Abdomen blando, depresible, no doloroso. Genitales externos normoconfigurados, cérvix cerrado sin sangrado activo."></textarea>
+                    </div>
+                    <div class="form-field col-12">
+                        <label>Estudios Complementarios Realizados (Ecografías, Labs, Citología):</label>
+                        <textarea id="infEstudios" rows="3" placeholder="Ecografía transvaginal reporta: Útero en AVF de 75 x 42 x 38 mm, endometrio trilaminar de 7 mm. Ovarios de morfología normal. Fondo de saco libre."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagnóstico y Plan Médico -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Diagnóstico Clínico y Conducta Terapéutica</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label>Diagnóstico Clínico Definitivo / Presuntivo *</label>
+                        <textarea id="infDiagnostico" rows="2" required placeholder="1. Gestación simple activa de 28 semanas por FUR / Feto único vivo en presentación cefálica.&#10;2. Evolución obstétrica satisfactoria."></textarea>
+                    </div>
+                    <div class="form-field col-12">
+                        <label>Plan de Tratamiento, Indicaciones y Sugerencias Médicas *</label>
+                        <textarea id="infPlan" rows="3" required placeholder="1. Continuar suplementación prenatal con hierro y ácido fólico.&#10;2. Mantener reposo relativo y dieta balanceada.&#10;3. Próximo control prenatal en 4 semanas con perfil paraclínico de III trimestre."></textarea>
+                    </div>
+                </div>
+            </section>
+
+        </form>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+
+        </div> <!-- Fin de #printableReportSheet -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/informe_medico.js?v=7.0"></script>
+</body>
+
+</html>

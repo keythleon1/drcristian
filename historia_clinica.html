@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Historia Clínica Especializada</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- NAVEGACIÓN SUPERIOR DE MÓDULO (TABS) -->
+        <div class="top-nav-tabs no-print">
+            <button type="button" class="tab-btn active-tab" onclick="loadView('nuevo')" id="tabNuevo">
+                Historia Clínica
+            </button>
+            <button type="button" class="tab-btn" onclick="loadView('seguimiento')" id="tabSeguimiento">
+                Evolución y Próxima Cita
+            </button>
+            <button type="button" class="tab-btn" onclick="loadView('historial')" id="tabHistorial">
+                Base de Datos / Historial
+            </button>
+        </div>
+
+        <!-- ==============================================================
+             VISTA 1: HISTORIA CLÍNICA
+             ============================================================== -->
+        <div id="viewNuevo" class="content-view-section">
+            
+            <!-- Barra Superior de Acciones -->
+            <div class="top-action-bar no-print">
+                <div class="top-bar-left">
+                    <div class="breadcrumb-nav">
+                        <a href="dashboard.html">Inicio</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">Historia Clínica</span>
+                    </div>
+                </div>
+
+                <div class="top-bar-buttons">
+                    <button type="button" class="btn-action-util" id="btnClearForm" title="Limpiar formulario">
+                        Limpiar
+                    </button>
+                    <button type="button" class="btn-action-primary" id="btnDownloadPDF" title="Descargar historia clínica oficial en PDF">
+                        Descargar PDF
+                    </button>
+                    <button type="button" class="btn-action-save" id="btnSaveRecord" title="Guardar cambios en el expediente">
+                        Guardar Historia
+                    </button>
+                </div>
+            </div>
+
+
+        <!-- ==============================================================
+             SELECTOR DUAL: EMBARAZADA (OBSTETRICIA) vs NO EMBARAZADA (GINECOLOGÍA)
+             ============================================================== -->
+        <div class="dual-switch-wrapper no-print fade-in-up">
+            <div class="dual-switch-info">
+                <h3>Modalidad de Historia Clínica</h3>
+                <p>Seleccione si la paciente se encuentra en gestación (Control Prenatal) o asiste a chequeo ginecológico general.</p>
+            </div>
+
+            <div class="dual-switch-btns">
+                <button type="button" class="dual-btn active-dual-prenatal" id="btnModePrenatal">
+                    Control Prenatal (Embarazada)
+                </button>
+                <button type="button" class="dual-btn" id="btnModeGyn">
+                    Ginecología General (No Embarazada)
+                </button>
+            </div>
+        </div>
+
+        <form id="clinicalHistoryForm">
+
+            <!-- 1. DATOS PERSONALES -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">Datos Personales de la Paciente</h3>
+                    <span class="badge-tag">Filiación</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label for="pNombre">Nombre y Apellido *</label>
+                        <input type="text" id="pNombre" required placeholder="Ej: Mariana Sofia Gomez">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="pCedula">Cédula de Identidad *</label>
+                        <input type="text" id="pCedula" required placeholder="Ej: V-24.589.123">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="pFechaNac">Fecha de Nacimiento</label>
+                        <input type="date" id="pFechaNac">
+                    </div>
+
+                    <div class="form-field col-2">
+                        <label for="pEdad">Edad (Años)</label>
+                        <input type="number" id="pEdad" placeholder="Ej: 28">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="pLugarNac">Lugar de Nacimiento</label>
+                        <input type="text" id="pLugarNac" placeholder="Ciudad / Estado">
+                    </div>
+
+                    <div class="form-field col-2">
+                        <label for="pPeso">Peso (kg)</label>
+                        <input type="number" step="0.1" id="pPeso" placeholder="Ej: 64.5">
+                    </div>
+
+                    <div class="form-field col-2">
+                        <label for="pTalla">Talla (m o cm)</label>
+                        <input type="number" step="0.01" id="pTalla" placeholder="Ej: 1.65">
+                    </div>
+
+                    <div class="form-field col-2">
+                        <label>IMC (kg/m²)</label>
+                        <div class="calc-badge" id="badgeIMC">-- (Sin calcular)</div>
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="pTipoSangre">Tipo de Sangre (Paciente)</label>
+                        <select id="pTipoSangre">
+                            <option value="">Seleccionar...</option>
+                            <option value="O+">O Positivo (O+)</option>
+                            <option value="O-">O Negativo (O-)</option>
+                            <option value="A+">A Positivo (A+)</option>
+                            <option value="A-">A Negativo (A-)</option>
+                            <option value="B+">B Positivo (B+)</option>
+                            <option value="B-">B Negativo (B-)</option>
+                            <option value="AB+">AB Positivo (AB+)</option>
+                            <option value="AB-">AB Negativo (AB-)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="pFechaCaptacion">Fecha de Captación</label>
+                        <input type="date" id="pFechaCaptacion">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="pTelefono">Teléfono de Contacto</label>
+                        <input type="tel" id="pTelefono" placeholder="0414-0000000">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="pVacunacion">Vacunación</label>
+                        <input type="text" id="pVacunacion" placeholder="Toxoide, Covid, Influenza...">
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label for="pMotivoConsulta">Motivo de Consulta *</label>
+                        <textarea id="pMotivoConsulta" rows="2" placeholder="Describa el motivo de la consulta médica..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- 2. ANTECEDENTES PERSONALES -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">Antecedentes Personales Patológicos</h3>
+                    <span class="badge-tag">Médicos</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-4">
+                        <label for="antEnfermedad">Enfermedades de Base:</label>
+                        <input type="text" id="antEnfermedad" placeholder="HTA, Asma, Tiroides, Diabetes...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="antEruptivas">Eruptivas:</label>
+                        <input type="text" id="antEruptivas" placeholder="Varicela, Rubéola, Sarampión...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="antAlergias">Alergias Medicamentosas / Otras:</label>
+                        <input type="text" id="antAlergias" placeholder="Penicilina, AINEs, etc.">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="antTraumatismos">Traumatismos:</label>
+                        <input type="text" id="antTraumatismos" placeholder="Fracturas, accidentes...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="antQuirurgicos">Quirúrgicos:</label>
+                        <input type="text" id="antQuirurgicos" placeholder="Apendicectomía, cesáreas previas...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="antTransfusiones">Transfusiones:</label>
+                        <input type="text" id="antTransfusiones" placeholder="Niega / Reacciones">
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label for="antComplicaciones">Complicaciones Médicas / Anestésicas:</label>
+                        <input type="text" id="antComplicaciones" placeholder="Hemorragias, shock, infecciones...">
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- 3. ANTECEDENTES GINECOLÓGICOS Y OBSTÉTRICOS -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">Antecedentes Ginecológicos y Obstétricos</h3>
+                    <span class="badge-tag">Gineco-Obstétrico</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-2">
+                        <label for="gynMenarquia">Menarquia (Años):</label>
+                        <input type="number" id="gynMenarquia" placeholder="Ej: 12">
+                    </div>
+
+                    <div class="form-field col-2">
+                        <label for="gynParejas">Parejas Sexuales:</label>
+                        <input type="number" id="gynParejas" placeholder="Ej: 1">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="gynAnticonceptivos">Anticonceptivos Usados:</label>
+                        <input type="text" id="gynAnticonceptivos" placeholder="Orales - DIU - Intradérmico - Barrera - Otros">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="gynITS">Enfermedades Transmisión Sexual (ITS):</label>
+                        <input type="text" id="gynITS" placeholder="VPH, Clamidia, Herpes, Niega...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="gynCitologia">Citología Previa:</label>
+                        <input type="text" id="gynCitologia" placeholder="Fecha y resultado (Negativa / Inflamatoria...)">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="gynFUR">FUR (Fecha Última Regla):</label>
+                        <input type="date" id="gynFUR">
+                    </div>
+
+                    <div class="form-field col-2">
+                        <label for="gynCiclo">Ciclo / Tipo:</label>
+                        <input type="text" id="gynCiclo" placeholder="Ej: 28/4 Regular">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label for="gynPMF">Planificación Familiar (PMF):</label>
+                        <input type="text" id="gynPMF" placeholder="Deseo gestacional / DIU / ACO">
+                    </div>
+
+                    <!-- FÓRMULA OBSTÉTRICA A.O. NORMALIZADA -->
+                    <div class="form-field col-12 formula-ao-container">
+                        <label class="formula-ao-label">Antecedentes Obstétricos (A.O):</label>
+                        <div class="formula-ao-grid">
+                            <div class="ao-cell">
+                                <span class="ao-cell-title">Gestas</span>
+                                <input type="number" id="aoGestas" placeholder="0" min="0">
+                            </div>
+                            <div class="ao-cell">
+                                <span class="ao-cell-title">Partos</span>
+                                <input type="number" id="aoPartos" placeholder="0" min="0">
+                            </div>
+                            <div class="ao-cell">
+                                <span class="ao-cell-title">Cesáreas</span>
+                                <input type="number" id="aoCesareas" placeholder="0" min="0">
+                            </div>
+                            <div class="ao-cell">
+                                <span class="ao-cell-title">Abortos</span>
+                                <input type="number" id="aoAbortos" placeholder="0" min="0">
+                            </div>
+                            <div class="ao-cell">
+                                <span class="ao-cell-title">Otros</span>
+                                <input type="text" id="aoOtros" placeholder="Ectópico, Mola">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label for="aoEmbarazoAnt">Embarazo Anterior:</label>
+                        <input type="text" id="aoEmbarazoAnt" placeholder="Peso RN, año, término/pretérmino">
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label for="aoComplicacionesAnt">Complicaciones Obstétricas Previas:</label>
+                        <input type="text" id="aoComplicacionesAnt" placeholder="Preeclampsia, diabetes gestacional, RPM...">
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- 4. ANTECEDENTES FAMILIARES -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">Antecedentes Familiares Hereditarios</h3>
+                    <span class="badge-tag">Familiares</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-4">
+                        <label for="famMadre">Madre:</label>
+                        <input type="text" id="famMadre" placeholder="Viva / HTA, DM, Cáncer...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="famPadre">Padre:</label>
+                        <input type="text" id="famPadre" placeholder="Vivo / HTA, Cardiopatía...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="famEsposo">Esposo / Pareja:</label>
+                        <input type="text" id="famEsposo" placeholder="Aparente buen estado de salud...">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="famHermanos">Hermanos:</label>
+                        <input type="text" id="famHermanos" placeholder="Sanos / Patología">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="famHijos">Hijos:</label>
+                        <input type="text" id="famHijos" placeholder="Vivos y sanos">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="famGrupoSangrePadre">Grupo Sanguíneo del Padre (Pareja):</label>
+                        <select id="famGrupoSangrePadre">
+                            <option value="">Seleccionar...</option>
+                            <option value="O+">O Positivo (O+)</option>
+                            <option value="O-">O Negativo (O-)</option>
+                            <option value="A+">A Positivo (A+)</option>
+                            <option value="A-">A Negativo (A-)</option>
+                            <option value="B+">B Positivo (B+)</option>
+                            <option value="B-">B Negativo (B-)</option>
+                            <option value="AB+">AB Positivo (AB+)</option>
+                            <option value="AB-">AB Negativo (AB-)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==============================================================
+                 BLOQUE A: EXCLUSIVO PARA EMBARAZADAS (CONTROL PRENATAL OBSTÉTRICO)
+                 ============================================================== -->
+            <div id="sectionPrenatalOnly">
+
+                <!-- DATOS CRÍTICOS GESTACIONALES -->
+                <section class="clinical-card fade-in-up">
+                    <div class="clinical-card-header">
+                        <h3 class="clinical-card-title">Cálculo Gestacional &bull; Regla de Naegele</h3>
+                        <span class="badge-tag">Materno-Fetal</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field col-4">
+                            <label for="prenatalFPP">F.P.P. (Fecha Probable de Parto):</label>
+                            <input type="date" id="prenatalFPP">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label>Edad Gestacional Actual (EG):</label>
+                            <div class="calc-badge status-normal" id="badgeEG">
+                                Ingrese FUR para calcular
+                            </div>
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="prenatalInductores">Inductores MPF (Maduración Pulmonar):</label>
+                            <input type="text" id="prenatalInductores" placeholder="Betametasona 12mg / Esquema y fechas">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ESTUDIOS ESPECIALES PRENATALES -->
+                <section class="clinical-card fade-in-up">
+                    <div class="clinical-card-header">
+                        <h3 class="clinical-card-title">Estudios Especiales Obstétricos</h3>
+                        <span class="badge-tag">Ecografías Genéticas</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field col-3">
+                            <label for="ecoGenetico1Fecha">Eco Genético I (Sem 11-13) - Fecha:</label>
+                            <input type="date" id="ecoGenetico1Fecha">
+                        </div>
+                        <div class="form-field col-9">
+                            <label for="ecoGenetico1Diag">Diagnóstico / Hallazgos Eco Genético I:</label>
+                            <input type="text" id="ecoGenetico1Diag" placeholder="TN, Hueso nasal, Ductus venoso, regurgitación tricuspídea, riesgo bajo/alto">
+                        </div>
+
+                        <div class="form-field col-3">
+                            <label for="ecoGenetico2Fecha">Eco Genético II (Sem 18-22) - Fecha:</label>
+                            <input type="date" id="ecoGenetico2Fecha">
+                        </div>
+                        <div class="form-field col-9">
+                            <label for="ecoGenetico2Diag">Diagnóstico / Morfología Eco Genético II:</label>
+                            <input type="text" id="ecoGenetico2Diag" placeholder="Anatomía fetal detallada, marcadores de aneuploidía, longitud cervical">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="eco3D">Eco 3D / 4D (Fecha y Resultado):</label>
+                            <input type="text" id="eco3D" placeholder="Reconstrucción facial fetal y morfología de superficie">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="ecoDoppler">Eco Doppler Feto-Placentario:</label>
+                            <input type="text" id="ecoDoppler" placeholder="Arterias uterinas, arteria umbilical, ACM, DV">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="ecoCardioFetal">Ecocardiograma Fetal (Sem 24-28):</label>
+                            <input type="text" id="ecoCardioFetal" placeholder="4 cámaras, tractos de salida, arco aórtico">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PRUEBAS ESPECIALES DE LABORATORIO -->
+                <section class="clinical-card fade-in-up">
+                    <div class="clinical-card-header">
+                        <h3 class="clinical-card-title">Pruebas Especiales de Laboratorio</h3>
+                        <span class="badge-tag">Serologías y Cultivos</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field col-4">
+                            <label for="testToxo">Test Toxoplasmosis (IgG / IgM):</label>
+                            <input type="text" id="testToxo" placeholder="Resultado / Títulos">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="testCMV">Citomegalovirus (CMV):</label>
+                            <input type="text" id="testCMV" placeholder="IgG / IgM">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="testHep">Hepatitis B (HBsAg) y C (VHC):</label>
+                            <input type="text" id="testHep" placeholder="No Reactivo / Reactivo">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="testDMG">Despistaje D.M.G (Sem 24-28):</label>
+                            <input type="text" id="testDMG" placeholder="PTGO 75g glucosa: basal, 1h, 2h">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="testStrepto">Cultivo S. agalactiae Grupo B (Sem 34-36):</label>
+                            <input type="text" id="testStrepto" placeholder="Hisopado vagino-rectal: Negativo / Positivo">
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="testUrocultivo">Urocultivo con Antibiograma:</label>
+                            <input type="text" id="testUrocultivo" placeholder="Negativo / Germen y sensibilidad">
+                        </div>
+
+                        <div class="form-field col-12">
+                            <label for="testFlujo">Cultivo de Secreciones Vaginales:</label>
+                            <input type="text" id="testFlujo" placeholder="Examen al fresco, Gram y cultivo de secreción">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TABLAS DINÁMICAS PRENATALES -->
+                
+                <!-- 1. CONSULTA PRENATAL (EVOLUCIÓN CLÍNICA) -->
+                <div class="prenatal-table-box fade-in-up">
+                    <div class="prenatal-table-header">
+                        <h4>Registro de Consultas Prenatales Sucesivas</h4>
+                        <button type="button" class="btn-add-row" id="btnAddRowConsulta">
+                            <i class="fas fa-plus"></i> Añadir Consulta
+                        </button>
+                    </div>
+                    <div class="prenatal-table-responsive">
+                        <table class="table-prenatal-grid" id="tableConsultas">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Peso (kg)</th>
+                                    <th>T.A (mmHg)</th>
+                                    <th>F.C</th>
+                                    <th>Temp (°C)</th>
+                                    <th>SpO2 (%)</th>
+                                    <th>A.U (cm)</th>
+                                    <th>FCF (lpm)</th>
+                                    <th>Presentación</th>
+                                    <th>Edema</th>
+                                    <th>Orina</th>
+                                    <th>E.G</th>
+                                    <th class="no-print" style="width: 40px;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Fila 1 inicial -->
+                                <tr>
+                                    <td><input type="date" class="row-fecha"></td>
+                                    <td><input type="text" placeholder="65.0"></td>
+                                    <td><input type="text" placeholder="110/70"></td>
+                                    <td><input type="text" placeholder="78"></td>
+                                    <td><input type="text" placeholder="36.5"></td>
+                                    <td><input type="text" placeholder="99"></td>
+                                    <td><input type="text" placeholder="22"></td>
+                                    <td><input type="text" placeholder="145"></td>
+                                    <td><input type="text" placeholder="Cefálica"></td>
+                                    <td><input type="text" placeholder="No"></td>
+                                    <td><input type="text" placeholder="Normal"></td>
+                                    <td><input type="text" placeholder="24 sem"></td>
+                                    <td class="no-print"><button type="button" class="btn-row-del" onclick="deleteTableRow(this)"><i class="far fa-trash-can"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. LABORATORIO -->
+                <div class="prenatal-table-box fade-in-up">
+                    <div class="prenatal-table-header">
+                        <h4>Registro de Controles de Laboratorio</h4>
+                        <button type="button" class="btn-add-row" id="btnAddRowLab">
+                            <i class="fas fa-plus"></i> Añadir Laboratorio
+                        </button>
+                    </div>
+                    <div class="prenatal-table-responsive">
+                        <table class="table-prenatal-grid" id="tableLabs">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>HgB</th>
+                                    <th>Hto</th>
+                                    <th>LEUCO</th>
+                                    <th>PLAQ</th>
+                                    <th>VDRL</th>
+                                    <th>HIV</th>
+                                    <th>GliCe</th>
+                                    <th>UREA</th>
+                                    <th>Creat.</th>
+                                    <th>ORINA</th>
+                                    <th>OTROS</th>
+                                    <th class="no-print" style="width: 40px;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="date" class="row-fecha"></td>
+                                    <td><input type="text" placeholder="12.4"></td>
+                                    <td><input type="text" placeholder="37.5"></td>
+                                    <td><input type="text" placeholder="8.500"></td>
+                                    <td><input type="text" placeholder="240.000"></td>
+                                    <td><input type="text" placeholder="No Reactivo"></td>
+                                    <td><input type="text" placeholder="No Reactivo"></td>
+                                    <td><input type="text" placeholder="85"></td>
+                                    <td><input type="text" placeholder="24"></td>
+                                    <td><input type="text" placeholder="0.7"></td>
+                                    <td><input type="text" placeholder="Normal"></td>
+                                    <td><input type="text" placeholder="-"></td>
+                                    <td class="no-print"><button type="button" class="btn-row-del" onclick="deleteTableRow(this)"><i class="far fa-trash-can"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. ECOSONOGRAMAS -->
+                <div class="prenatal-table-box fade-in-up">
+                    <div class="prenatal-table-header">
+                        <h4>Registro de Ecosonogramas Fetales</h4>
+                        <button type="button" class="btn-add-row" id="btnAddRowEco">
+                            <i class="fas fa-plus"></i> Añadir Ecosonograma
+                        </button>
+                    </div>
+                    <div class="prenatal-table-responsive">
+                        <table class="table-prenatal-grid" id="tableEcos">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>DBP</th>
+                                    <th>C.C</th>
+                                    <th>C.A</th>
+                                    <th>L.F</th>
+                                    <th>Placenta</th>
+                                    <th>Intest.</th>
+                                    <th>L.A</th>
+                                    <th>Talla</th>
+                                    <th>Peso</th>
+                                    <th>Perfil Biofísico</th>
+                                    <th>E.G.E</th>
+                                    <th class="no-print" style="width: 40px;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="date" class="row-fecha"></td>
+                                    <td><input type="text" placeholder="62 mm"></td>
+                                    <td><input type="text" placeholder="224 mm"></td>
+                                    <td><input type="text" placeholder="200 mm"></td>
+                                    <td><input type="text" placeholder="44 mm"></td>
+                                    <td><input type="text" placeholder="Normoinserta"></td>
+                                    <td><input type="text" placeholder="Normal"></td>
+                                    <td><input type="text" placeholder="Normal"></td>
+                                    <td><input type="text" placeholder="32 cm"></td>
+                                    <td><input type="text" placeholder="680 g"></td>
+                                    <td><input type="text" placeholder="8/8"></td>
+                                    <td><input type="text" placeholder="24 sem"></td>
+                                    <td class="no-print"><button type="button" class="btn-row-del" onclick="deleteTableRow(this)"><i class="far fa-trash-can"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ==============================================================
+                 BLOQUE B: EXCLUSIVO PARA NO EMBARAZADAS (GINECOLOGÍA GENERAL)
+                 ============================================================== -->
+            <div id="sectionGynOnly" style="display: none;">
+
+                <!-- ECOGRAFÍAS GINECOLÓGICAS -->
+                <section class="clinical-card fade-in-up">
+                    <div class="clinical-card-header">
+                        <h3 class="clinical-card-title">Evaluación Ecográfica Ginecológica</h3>
+                        <span class="badge-tag">Ecografía</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field col-4">
+                            <label for="gynEcoMamaria">Ecografía Mamaria:</label>
+                            <textarea id="gynEcoMamaria" rows="3" placeholder="Piel y pezón conservados. Tejido fibroglandular homogéneo. Sin nódulos sólidos ni quísticos sospechosos. Axilas libres. BIRADS I/II."></textarea>
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="gynEcoPelvica">Ecografía Pélvica:</label>
+                            <textarea id="gynEcoPelvica" rows="3" placeholder="Vejiga con repleción adecuada. Útero en AVF de dimensiones conservadas. Anexos visualizados sin alteraciones aparentes."></textarea>
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="gynEcoTransvaginal">Ecografía Transvaginal:</label>
+                            <textarea id="gynEcoTransvaginal" rows="3" placeholder="Útero regular, miometrio homogéneo. Endometrio trilaminar de espesor normal. Ovario derecho e izquierdo con adecuado recuento folicular. Fondo de saco de Douglas libre."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CITOLOGÍA Y COLPOSCOPIA (CORPOSCOPIA) -->
+                <section class="clinical-card fade-in-up">
+                    <div class="clinical-card-header">
+                        <h3 class="clinical-card-title">Citología Cérvico-Vaginal y Colposcopia</h3>
+                        <span class="badge-tag">Tracto Genital Inferior</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field col-6">
+                            <label for="gynCitologiaResult">Citología (Toma de Papanicolaou):</label>
+                            <textarea id="gynCitologiaResult" rows="3" placeholder="Calidad de la muestra satisfactoria. Negativa para lesión intraepitelial o malignidad (NILM). Cambios celulares reactivos asociados a inflamación."></textarea>
+                        </div>
+
+                        <div class="form-field col-6">
+                            <label for="gynColposcopiaResult">Colposcopia (Corposcopia):</label>
+                            <textarea id="gynColposcopiaResult" rows="3" placeholder="Cérvix eutrófico, zona de transformación tipo 1. Unión escamo-columnar visible. Prueba de ácido acético negativa. Test de Schiller yodo positivo caoba. Sin signos de malignidad."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DIAGNÓSTICO, INDICACIONES Y TRATAMIENTO -->
+                <section class="clinical-card fade-in-up">
+                    <div class="clinical-card-header">
+                        <h3 class="clinical-card-title">Diagnóstico, Indicaciones y Tratamiento Ginecológico</h3>
+                        <span class="badge-tag">Plan Clínico</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field col-12">
+                            <label for="gynDiagnostico">Diagnóstico Clínico / Ginecológico *</label>
+                            <textarea id="gynDiagnostico" rows="2" placeholder="1. Examen ginecológico normal preventivo / 2. Cervicovaginitis inespecífica / 3. Trastorno menstrual..."></textarea>
+                        </div>
+
+                        <div class="form-field col-12">
+                            <label for="gynIndicacionesTratamiento">Indicaciones y Tratamiento Farmacéutico:</label>
+                            <textarea id="gynIndicacionesTratamiento" rows="3" placeholder="Pautas higiénico-dietéticas, medicamentos indicados, posología y conducta médica a seguir..."></textarea>
+                        </div>
+
+                        <div class="form-field col-4">
+                            <label for="gynProximaCita">Próxima Consulta:</label>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <input type="date" id="gynProximaCita">
+                                <button type="button" class="btn-wa-reminder-pill no-print" id="btnWaGynReminder" title="Enviar recordatorio de consulta ginecológica por WhatsApp">
+                                    <i class="fab fa-whatsapp"></i> Recordar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </form>
+        </div><!-- /#viewNuevo -->
+
+        <!-- ==============================================================
+             VISTA 2: EVOLUCIÓN MÉDICA, PAUTAS Y PRÓXIMA CITA (SEGUIMIENTO)
+             ============================================================== -->
+        <div id="viewSeguimiento" class="content-view-section" style="display: none;">
+            
+            <!-- Barra Superior de Acciones de Seguimiento -->
+            <div class="top-action-bar no-print">
+                <div class="top-bar-left">
+                    <div class="breadcrumb-nav">
+                        <a href="dashboard.html">Inicio</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <a href="javascript:void(0)" onclick="loadView('nuevo')">Historia Clínica</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current">Evolución y Próxima Cita</span>
+                    </div>
+                </div>
+
+                <div class="top-bar-buttons">
+                    <button type="button" class="btn-action-primary" id="btnDownloadPDFSeg" title="Descargar historia clínica oficial en PDF">
+                        Descargar PDF
+                    </button>
+                    <button type="button" class="btn-action-save" id="btnSaveRecordSeg" title="Guardar cambios en el expediente">
+                        Guardar Historia
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ficha de la Paciente en Consulta -->
+            <div class="clinical-card fade-in-up" style="margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Paciente en Seguimiento</div>
+                        <h3 id="seguimientoPatientBadge" style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #0f2b5c;">Mariana Sofia Gomez &bull; C.I: 25.489.123</h3>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-action-util" onclick="loadView('nuevo')" style="font-size: 0.82rem;">
+                            Ir a Historia Clínica Base
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN EXCLUSIVA: EVOLUCIÓN MÉDICA, PAUTAS Y PRÓXIMA CITA -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">Evolución Médica, Pautas y Próxima Cita</h3>
+                    <span class="badge-tag">Seguimiento</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label for="prenatalEvolucion">Evolución Clínica y Conducta:</label>
+                        <textarea id="prenatalEvolucion" rows="3" placeholder="Evolución clínica en consulta...">Paciente en adecuadas condiciones clínicas. Movimientos fetales activos presentes. PA: 110/70 mmHg, AU: 31cm, FCF: 142 lpm. Sin dinámica uterina dolorosa, sin hidrorrea ni pérdidas transvaginales.</textarea>
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label for="prenatalTratamiento">Tratamiento Farmacéutico Prescrito:</label>
+                        <textarea id="prenatalTratamiento" rows="2" placeholder="Tratamiento prescrito...">Sulfato Ferroso 200mg + Ácido Fólico 1mg VO OD. Calcio 600mg + Vit D3 VO OD. Acetaminofén 500mg SOS.</textarea>
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label for="prenatalProximaCita">Próxima Cita de Control:</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="date" id="prenatalProximaCita" value="2026-10-27">
+                            <button type="button" class="btn-wa-reminder-pill no-print" id="btnWaPrenatalReminder" title="Enviar recordatorio de control prenatal por WhatsApp">
+                                Recordar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-field col-8">
+                        <label>Signos de Alarma Obstétrica Notificados a la Paciente:</label>
+                        <p style="font-size: 0.88rem; color: #475569; line-height: 1.5; margin-top: 6px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            Sangrado vaginal, pérdida de líquido, disminución de movimientos fetales, cefalea, visión borrosa, acúfenos/piticos, epigastralgia.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /#viewSeguimiento -->
+
+        <!-- ==============================================================
+             DOCUMENTO CLÍNICO OFICIAL DE 2 PÁGINAS (PARA DESCARGA DIRECTA EN PDF)
+             ============================================================== -->
+        <div id="printableHistoryDossier" class="history-dossier-wrapper">
+            
+            <!-- PÁGINA 1: FILIACIÓN, ANTECEDENTES Y FÓRMULA OBSTÉTRICA -->
+            <div class="dossier-page page-1">
+                <!-- Membrete Oficial del Dr. Christian A. Rodríguez C. -->
+                <div class="dossier-letterhead">
+                    <div class="dossier-brand">
+                        <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="dossier-logo">
+                        <div class="dossier-doctor-info">
+                            <h1 class="dossier-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                            <h2 class="dossier-doc-specialty">GINECOLOGÍA Y OBSTETRICIA</h2>
+                            <div class="dossier-doc-creds">MPPS: 96.430 &bull; CMG: 4232 &bull; RIF: V-18288931-4</div>
+                            <div class="dossier-doc-contact">
+                                <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dossier-title-box">
+                        <div class="dossier-title-tag">EXPEDIENTE MÉDICO CLÍNICO</div>
+                        <h3 class="dossier-doc-title" id="dossierMainTitle">HISTORIA CLÍNICA OBSTÉTRICA</h3>
+                        <div class="dossier-doc-meta" id="dossierMetaLine">C.I: 25.489.123 &bull; Emisión: 13/10/2026</div>
+                    </div>
+                </div>
+
+                <!-- I. FILIACIÓN Y DATOS DE LA PACIENTE -->
+                <div class="dossier-section">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">I.</span>
+                        <span class="dossier-sec-title">DATOS DE FILIACIÓN DE LA PACIENTE</span>
+                    </div>
+                    <table class="dossier-table-grid">
+                        <tr>
+                            <td class="lbl" style="width: 18%;">PACIENTE:</td>
+                            <td class="val strong" id="dossierNombre" style="width: 42%;">Mariana Sofia Gomez</td>
+                            <td class="lbl" style="width: 18%;">CÉDULA DE IDENTIDAD:</td>
+                            <td class="val strong" id="dossierCedula" style="width: 22%;">V-25.489.123</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">EDAD / F. NAC:</td>
+                            <td class="val" id="dossierEdadFn">28 años (14/05/1998)</td>
+                            <td class="lbl">LUGAR NACIMIENTO:</td>
+                            <td class="val" id="dossierLugar">Caracas, Dtto. Capital</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">TELÉFONO:</td>
+                            <td class="val" id="dossierTelefono">0414-1234567</td>
+                            <td class="lbl">GRUPO SANGUÍNEO:</td>
+                            <td class="val strong" id="dossierSangre">O Positivo (O+)</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">PESO / TALLA / IMC:</td>
+                            <td class="val" id="dossierAntropo">Peso: 64.5 kg | Talla: 1.65 m | IMC: 23.7 kg/m² (Normal)</td>
+                            <td class="lbl">F. CAPTACIÓN / VACUNAS:</td>
+                            <td class="val" id="dossierCaptacionVacunas">10/05/2026 &bull; Toxoide, Influenza, Covid</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- II. MOTIVO DE CONSULTA Y ENFERMEDAD ACTUAL -->
+                <div class="dossier-section">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">II.</span>
+                        <span class="dossier-sec-title">MOTIVO DE CONSULTA Y ENFERMEDAD ACTUAL</span>
+                    </div>
+                    <div class="dossier-text-box" id="dossierMotivo">
+                        Control Prenatal - Evaluación Semana 24
+                    </div>
+                </div>
+
+                <!-- III. ANTECEDENTES PERSONALES Y FAMILIARES -->
+                <div class="dossier-section">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">III.</span>
+                        <span class="dossier-sec-title">ANTECEDENTES PERSONALES PATOLÓGICOS Y FAMILIARES</span>
+                    </div>
+                    <table class="dossier-table-grid">
+                        <tr>
+                            <td class="lbl" style="width: 24%;">PATOLOGÍAS DE BASE:</td>
+                            <td class="val" id="dossierAntEnfermedad" style="width: 76%;">Niega patologías crónicas de base</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">QUIRÚRGICOS / ALERGIAS:</td>
+                            <td class="val" id="dossierAntQuirurgAlerg">Apendicectomía en 2018. Niega alergias medicamentosas o alimentarias.</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">ERUPTIVAS / TRANSFUSIONES:</td>
+                            <td class="val" id="dossierAntErupTransf">Varicela en la infancia sin secuelas. Niega transfusiones sanguíneas.</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">HEREDOFAMILIARES:</td>
+                            <td class="val" id="dossierAntFamiliares">Madre viva con HTA controlada. Padre vivo aparentemente sano. Pareja de 30 años sana.</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- IV. ANTECEDENTES GINECO-OBSTÉTRICOS Y FÓRMULA OBSTÉTRICA -->
+                <div class="dossier-section">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">IV.</span>
+                        <span class="dossier-sec-title">ANTECEDENTES GINECOLÓGICOS Y FÓRMULA OBSTÉTRICA</span>
+                    </div>
+                    <table class="dossier-table-grid">
+                        <tr>
+                            <td class="lbl" style="width: 24%;">GINECOLÓGICOS:</td>
+                            <td class="val" id="dossierGynDatos" style="width: 76%;">Menarquia: 12 años &bull; Ciclos: 28/4 regular &bull; Parejas: 1 &bull; ITS: Niega &bull; Citología: 03/2026 Negativa para LIE</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">PLANIFICACIÓN PREVIA:</td>
+                            <td class="val" id="dossierGynAnticoncep">Barrera / Preservativo previo al embarazo. Deseo Gestacional Cumplido.</td>
+                        </tr>
+                    </table>
+                    <div class="dossier-subtable-title">FÓRMULA OBSTÉTRICA OFICIAL (PARIDAD):</div>
+                    <table class="dossier-table-parity">
+                        <thead>
+                            <tr>
+                                <th>GESTAS (G)</th>
+                                <th>PARTOS (P)</th>
+                                <th>CESÁREAS (C)</th>
+                                <th>ABORTOS (A)</th>
+                                <th>ECTÓPICOS</th>
+                                <th>HIJOS VIVOS</th>
+                                <th>CONDICIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="dossierG">1</td>
+                                <td id="dossierP">0</td>
+                                <td id="dossierC">0</td>
+                                <td id="dossierA">0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td class="strong" id="dossierParidadTipo">PRIMIGESTA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="dossier-page-footer-note">
+                    <span>Historia Clínica Oficial</span>
+                    <span>Página 1 de 2</span>
+                </div>
+            </div>
+
+            <!-- SALTO DE PÁGINA EXACTO -->
+            <div class="dossier-page-break"></div>
+
+            <!-- PÁGINA 2: EVALUACIÓN GESTACIONAL, PARACLÍNICOS, EVOLUCIÓN, DIAGNÓSTICO Y FIRMA -->
+            <div class="dossier-page page-2">
+                <div class="dossier-continuation-header">
+                    <div class="dossier-cont-left">
+                        HISTORIA CLÍNICA (CONTINUACIÓN)
+                    </div>
+                    <div class="dossier-cont-right" id="dossierContPatient">
+                        Paciente: Mariana Sofia Gomez &bull; C.I: 25.489.123
+                    </div>
+                </div>
+
+                <!-- V. EVALUACIÓN GESTACIONAL ACTUAL (CONTROL PRENATAL) -->
+                <div class="dossier-section" id="dossierSecObstetrica">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">V.</span>
+                        <span class="dossier-sec-title">EVALUACIÓN GESTACIONAL Y SIGNOS VITALES ACTUALES</span>
+                    </div>
+                    <table class="dossier-table-grid">
+                        <tr>
+                            <td class="lbl" style="width: 20%;">FUR / FPP:</td>
+                            <td class="val strong" id="dossierFurFpp" style="width: 40%;">FUR: 27/04/2026 &bull; FPP: 04/02/2027</td>
+                            <td class="lbl" style="width: 18%;">EDAD GESTACIONAL:</td>
+                            <td class="val strong" id="dossierEG" style="width: 22%;">24 sem + 1 día</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">SIGNOS VITALES:</td>
+                            <td class="val" id="dossierSignosVitales" colspan="3">T.A: 110/70 mmHg &bull; F.C: 76 lpm &bull; Temp: 36.5 °C &bull; SpO2: 99%</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">EVALUACIÓN FETAL:</td>
+                            <td class="val" id="dossierEvaluacionFetal" colspan="3">A.U: 31 cm &bull; FCF: 142 lpm &bull; Presentación: Cefálica &bull; Movimientos Fetales: Activos y presentes</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- VI. PARACLÍNICOS Y ESTUDIOS ESPECIALES -->
+                <div class="dossier-section">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">VI.</span>
+                        <span class="dossier-sec-title">ESTUDIOS PARACLÍNICOS Y ECOGRAFÍAS ESPECIALES</span>
+                    </div>
+                    <table class="dossier-table-grid">
+                        <tr>
+                            <td class="lbl" style="width: 24%;">SEROLOGÍAS / CULTIVOS:</td>
+                            <td class="val" id="dossierParaclinicos" style="width: 76%;">Toxoplasmosis: IgG (+) 42 UI/ml, IgM (-) &bull; CMV: Negativo &bull; Hep B/C: No reactivo &bull; DMG: Normal &bull; Urocultivo: Negativo</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">ECOGRAFÍAS / DOPPLER:</td>
+                            <td class="val" id="dossierEcografias">Ecografía Morfológica y Doppler Materno-Fetal: Biometría acorde a EG. Índice de líquido amniótico normal. Perfil Biofísico 10/10.</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- VII. EVOLUCIÓN CLÍNICA EN CONSULTA -->
+                <div class="dossier-section">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">VII.</span>
+                        <span class="dossier-sec-title">EVOLUCIÓN CLÍNICA EN CONSULTA</span>
+                    </div>
+                    <div class="dossier-text-box" id="dossierEvolucion">
+                        Paciente acude a control, feto en posición cefálica con adecuado tono y reactividad. Movimientos fetales percibidos activamente. Sin pérdidas hemáticas ni líquido transvaginal. Adecuada tolerancia materna a la gestación.
+                    </div>
+                </div>
+
+                <!-- VIII. DIAGNÓSTICO, TRATAMIENTO Y PRÓXIMA CITA -->
+                <div class="dossier-section">
+                    <div class="dossier-sec-header">
+                        <span class="dossier-sec-num">VIII.</span>
+                        <span class="dossier-sec-title">IMPRESIÓN DIAGNÓSTICA, TRATAMIENTO Y CONDUCTA</span>
+                    </div>
+                    <table class="dossier-table-grid">
+                        <tr>
+                            <td class="lbl" style="width: 24%;">DIAGNÓSTICO:</td>
+                            <td class="val strong" id="dossierDiagnostico" style="width: 76%;">1. GESTACIÓN SIMPLE ACTIVA DE 24 SEMANAS POR FUR Y ECOGRAFÍA.<br>2. FETO ÚNICO VIVO EN PRESENTACIÓN CEFÁLICA.<br>3. EVOLUCIÓN OBSTÉTRICA SATISFACTORIA.</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">TRATAMIENTO PRESCRITO:</td>
+                            <td class="val" id="dossierTratamiento">Polivitamínico prenatal, Sulfato Ferroso + Ácido Fólico VO OD, Calcio 600mg diario. Reposo relativo, hidratación abundante.</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">SIGNOS DE ALARMA:</td>
+                            <td class="val" id="dossierSignosAlarma">Sangrado vaginal, dolor abdominal intenso, salida de líquido amniótico, disminución de movimientos fetales, cefalea o alteraciones visuales.</td>
+                        </tr>
+                        <tr>
+                            <td class="lbl">PRÓXIMA CITA:</td>
+                            <td class="val strong" id="dossierProximaCita">09/11/2026</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- IX. FIRMA DEL MÉDICO TRATANTE -->
+                <div class="dossier-footer-signature" style="justify-content: flex-end;">
+                    <div class="dossier-stamp-box">
+                        <div class="dossier-stamp-line"></div>
+                        <div class="dossier-stamp-name">Firma del Médico Tratante</div>
+                    </div>
+                </div>
+
+                <div class="dossier-page-footer-note">
+                    <span>Historia Clínica Oficial</span>
+                    <span>Página 2 de 2</span>
+                </div>
+            </div>
+        </div>
+        </div><!-- /#viewNuevo -->
+
+        <!-- ==============================================================
+             VISTA 2: BASE DE DATOS / HISTORIAL
+             ============================================================== -->
+        <div id="viewHistorial" class="content-view-section" style="display: none;">
+            <div class="clinical-card fade-in-up">
+                <div class="view-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 16px;">
+                    <div class="view-header">
+                        <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">
+                            Base de Datos de Historias Clínicas
+                        </h2>
+                        <p style="font-size: 0.88rem; color: #64748b; margin: 0;">Registro y búsqueda de expedientes e historias clínicas generadas en el sistema.</p>
+                    </div>
+                    <div class="search-bar-wrapper" style="min-width: 320px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar por paciente, cédula o diagnóstico...">
+                    </div>
+                </div>
+
+                <!-- Tabla de datos -->
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 14%;">Fecha</th>
+                                <th style="width: 25%;">Paciente</th>
+                                <th style="width: 14%;">Cédula</th>
+                                <th style="width: 17%;">Modalidad</th>
+                                <th style="width: 20%;">Motivo / Diagnóstico</th>
+                                <th style="width: 10%; text-align: center;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Inyectado dinámicamente por JS -->
+                        </tbody>
+                    </table>
+
+                    <div id="emptyState" class="empty-state-box" style="display: none; padding: 48px 20px; text-align: center;">
+                        <i class="fas fa-folder-open" style="font-size: 2.8rem; color: #94a3b8; margin-bottom: 14px; display: block;"></i>
+                        <p class="empty-title" style="font-size: 1.05rem; font-weight: 600; color: #334155; margin-bottom: 6px;">No hay historias clínicas registradas</p>
+                        <p style="color: #64748b; font-size: 0.88rem; margin: 0;">Redacte un nuevo expediente en la pestaña "Elaborar Historia Clínica" y presione "Guardar Historia".</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/historia_clinica.js?v=7.0"></script>
+</body>
+
+</html>

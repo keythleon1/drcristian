@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Informe de Egreso / Epicrisis</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Informe de Egreso</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="egresoPatientSelect" title="Cargar datos de la paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearEgreso" title="Limpiar informe">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadEgresoPDF" title="Descargar informe de egreso oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveEgreso" title="Guardar informe de egreso">
+                    <i class="fas fa-floppy-disk"></i> Guardar Egreso
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL DE ALTA MÉDICA (1 PÁGINA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableEgresoSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+            <div class="letterhead-elegant-wrapper">
+                <div class="letterhead-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                    <div class="letterhead-doctor-info">
+                        <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                        <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                        <div class="letterhead-doc-contact-inline">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="letterhead-doc-badge-box">
+                    <div class="letterhead-doc-badge" id="egDocTitle">INFORME DE ALTA MÉDICA (EPICRISIS)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Egreso -->
+        <form id="formInformeEgreso">
+            
+            <!-- Datos de la Paciente y Estancia -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Datos de la Paciente y Estancia Hospitalaria</span>
+                    </h3>
+                    <span class="badge-tag badge-tag-amber">Epicrisis</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Nombre y Apellido de la Paciente *</label>
+                        <input type="text" id="egNombre" required placeholder="Nombre completo">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Cédula de Identidad *</label>
+                        <input type="text" id="egCedula" required placeholder="V-00.000.000">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Edad</label>
+                        <input type="number" id="egEdad" placeholder="Años">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label>Fecha de Ingreso *</label>
+                        <input type="date" id="egFechaIngreso" required>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Hora de Ingreso:</label>
+                        <input type="time" id="egHoraIngreso" value="08:00">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Fecha de Egreso *</label>
+                        <input type="date" id="egFechaEgreso" required>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Hora de Egreso:</label>
+                        <input type="time" id="egHoraEgreso" value="12:00">
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label>Diagnóstico de Ingreso:</label>
+                        <input type="text" id="egDiagIngreso" placeholder="Embarazo a término en trabajo de parto / Miomatosis sintomática">
+                    </div>
+                    <div class="form-field col-6">
+                        <label>Cirugía / Procedimiento Practicado:</label>
+                        <input type="text" id="egProcedimiento" placeholder="Cesárea segmentaria tipo Kerr + Salpingoclasia bilateral / Histerectomía">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Evolución Intrahospitalaria y Datos Neonatales -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Evolución Intrahospitalaria y Datos del Recién Nacido (si aplica)</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label>Resumen de la Evolución Clínica Durante la Estancia:</label>
+                        <textarea id="egEvolucion" rows="3" placeholder="Paciente cursa estancia postoperatoria con adecuada evolución. Hemodinámicamente estable, afebril, adecuada tolerancia a la vía oral y diuresis espontánea. Herida quirúrgica afrontada, limpia y seca. Loquios hemáticos escasos no fétidos."></textarea>
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label>RN Sexo:</label>
+                        <select id="egRnSexo">
+                            <option value="No aplica">No aplica (Ginecológica)</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Masculino">Masculino</option>
+                        </select>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>RN Peso (g):</label>
+                        <input type="text" id="egRnPeso" placeholder="Ej: 3.250 g">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>RN Talla (cm):</label>
+                        <input type="text" id="egRnTalla" placeholder="Ej: 50 cm">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>RN Apgar (1' y 5'):</label>
+                        <input type="text" id="egRnApgar" placeholder="Ej: 8 / 9 puntos">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagnóstico de Egreso, Tratamiento y Pautas -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Diagnóstico de Egreso, Tratamiento al Alta y Control</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label>Diagnóstico Definitivo de Egreso *</label>
+                        <textarea id="egDiagEgreso" rows="2" required placeholder="1. Puerperio quirúrgico mediato sin complicaciones.&#10;2. Recién nacido a término sano con lactancia materna exclusiva establecida."></textarea>
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label>Tratamiento Farmacológico al Alta / Egreso *</label>
+                        <textarea id="egTratamientoAlta" rows="3" required placeholder="1. Cefadroxilo 500mg vía oral cada 12 horas por 7 días.&#10;2. Ketoprofeno 100mg vía oral cada 8 horas por 4 días si hay dolor.&#10;3. Cura diaria de herida con solución antiséptica y agua hervida. Mantener seca."></textarea>
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label>Cita de Control Postquirúrgico:</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="date" id="egProximaCita">
+                            <button type="button" class="btn-wa-reminder-pill no-print" id="btnWaEgresoReminder" title="Enviar recordatorio postoperatorio por WhatsApp">
+                                <i class="fab fa-whatsapp"></i> Recordar Cita
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-field col-8">
+                        <label>Signos de Alarma para Acudir de Inmediato a Urgencias:</label>
+                        <input type="text" id="egSignosAlarma" value="Fiebre (>38°C), sangrado genital abundante con coágulos, secreción o enrojecimiento de la herida, dolor abdominal intenso que no cede.">
+                    </div>
+                </div>
+            </section>
+
+        </form>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+
+        </div> <!-- Fin de #printableEgresoSheet -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/informe_egreso.js?v=7.0"></script>
+</body>
+
+</html>

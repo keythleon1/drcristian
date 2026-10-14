@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Catálogo LiteFarma</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="recipe.html" class="btn-action btn-action-util" title="Ir al Emisor de Récipes">
+                <i class="fas fa-prescription"></i> Ir al Récipe
+            </a>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Panel
+            </a>
+
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Catálogo LiteFarma</span>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-save" id="btnOpenNewMedModal" title="Registrar nuevo medicamento en vademécum">
+                    <i class="fas fa-plus"></i> Registrar Medicamento
+                </button>
+            </div>
+        </div>
+
+        <section class="clinical-card fade-in-up">
+            <div class="clinical-card-header">
+                <h3 class="clinical-card-title">
+                    <span>Vademécum Gineco-Obstétrico</span>
+                </h3>
+                <div class="search-bar-wrapper" style="margin: 0; min-width: 300px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchMedInput" placeholder="Buscar por nombre, principio activo o indicación...">
+                </div>
+            </div>
+
+            <div class="agenda-filters" style="margin-bottom: 20px;">
+                <button type="button" class="filter-chip active" data-cat="all">Todos (<span id="countMedsAll">0</span>)</button>
+                <button type="button" class="filter-chip" data-cat="prenatal">Suplementos Gestacionales</button>
+                <button type="button" class="filter-chip" data-cat="antibiotico">Antimicrobianos</button>
+                <button type="button" class="filter-chip" data-cat="hormonal">Hormonales / Progesterona</button>
+                <button type="button" class="filter-chip" data-cat="antiespasmodico">Antiespasmódicos / Analgésicos</button>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="patient-table" id="tableMeds">
+                    <thead>
+                        <tr>
+                            <th>Medicamento / Principio</th>
+                            <th>Presentación</th>
+                            <th>Categoría</th>
+                            <th>Dosis Habitual</th>
+                            <th>Seguridad Embarazo</th>
+                            <th style="text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal Nuevo Medicamento -->
+    <div class="modal-backdrop" id="modalNewMed">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Registrar Medicamento</h2>
+                <button type="button" class="modal-close-btn" id="btnCloseMedModal">&times;</button>
+            </div>
+            <form id="formNewMed">
+                <div class="modal-body">
+                    <div class="modal-item modal-item-full">
+                        <label>Nombre Comercial / Genérico *</label>
+                        <input type="text" id="mNombre" required placeholder="Ej: Sulfato Ferroso + Ácido Fólico">
+                    </div>
+                    <div class="modal-item">
+                        <label>Presentación *</label>
+                        <input type="text" id="mPresentacion" required placeholder="Ej: Tabletas 200mg / 1mg">
+                    </div>
+                    <div class="modal-item">
+                        <label>Categoría Terapéutica *</label>
+                        <select id="mCategoria">
+                            <option value="prenatal">Suplemento Gestacional</option>
+                            <option value="antibiotico">Antimicrobiano</option>
+                            <option value="hormonal">Hormonal / Progesterona</option>
+                            <option value="antiespasmodico">Antiespasmódico / Analgésico</option>
+                        </select>
+                    </div>
+                    <div class="modal-item modal-item-full">
+                        <label>Dosis / Posología Habitual</label>
+                        <input type="text" id="mDosis" placeholder="Ej: 1 tableta cada 24 horas vía oral con agua">
+                    </div>
+                    <div class="modal-item">
+                        <label>Riesgo en Embarazo (FDA)</label>
+                        <select id="mFda">
+                            <option value="Cat A (Seguro)">Cat A (Seguro)</option>
+                            <option value="Cat B (Bajo riesgo)" selected>Cat B (Bajo riesgo)</option>
+                            <option value="Cat C (Riesgo evaluable)">Cat C (Riesgo evaluable)</option>
+                            <option value="Cat D (Riesgo demostrado)">Cat D (Riesgo demostrado)</option>
+                            <option value="Cat X (Contraindicado)">Cat X (Contraindicado)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-action btn-action-secondary" id="btnCancelMed">Cancelar</button>
+                    <button type="submit" class="btn-action btn-action-save">
+                        <i class="fas fa-check"></i> Guardar Medicamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/litefarma.js?v=7.0"></script>
+</body>
+
+</html>

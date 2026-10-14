@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Panel Clínico Integral</title>
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <!-- Script de protección de sesión -->
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista -->
+    <header class="dashboard-header">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal del Dashboard -->
+    <main class="dashboard-container">
+        
+        <!-- HERO CON AMBIENTE CLÍNICO & 4 MÉTRICAS EN VIVO -->
+        <section class="dashboard-hero fade-in-up">
+            <div class="hero-content-wrapper">
+                <div class="hero-welcome-row">
+                    <div class="hero-text-block">
+                        <h1>Bienvenido, Dr. Christian A. Rodríguez C.</h1>
+                        <p>Ginecología y Obstetricia</p>
+                    </div>
+
+                    <div class="hero-quick-actions">
+                        <a href="litefarma.html" class="hero-btn-action hero-btn-secondary">
+                            <i class="fas fa-pills"></i>
+                            <span>Vademécum LiteFarma</span>
+                        </a>
+                        <button type="button" class="hero-btn-action hero-btn-primary" id="btnHeroNewAppt">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Agendar Cita / Cirugía</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 Indicadores Clínicos (KPIs) -->
+                <div class="hero-stats-grid">
+                    <div class="hero-stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-box">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <span class="stat-trend-tag"><i class="fas fa-database"></i> Base Activa</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <span class="stat-large-val" id="statPatients">0</span>
+                            <span class="stat-card-title">Pacientes Registradas</span>
+                            <span class="stat-subtext">Expedientes clínicos</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-box">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <span class="stat-trend-tag">Agenda Hoy</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <span class="stat-large-val" id="statTodayAppts">0</span>
+                            <span class="stat-card-title">Citas para Hoy</span>
+                            <span class="stat-subtext" id="statApptsBreakdown">En turno de consulta</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-box">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <span class="stat-trend-tag" id="statRoomStatus">En Turno</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-split-numbers">
+                                <div class="split-col">
+                                    <span class="split-val" id="statPendingCount">0</span>
+                                    <span class="split-lbl">Pendientes</span>
+                                </div>
+                                <div class="split-divider"></div>
+                                <div class="split-col">
+                                    <span class="split-val" id="statDoneCount">0</span>
+                                    <span class="split-lbl">Atendidas</span>
+                                </div>
+                            </div>
+                            <div class="stat-progress-bar-bg" title="Progreso del día">
+                                <div class="stat-progress-bar-fill" id="statProgressBar" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon-box">
+                                <i class="far fa-clock"></i>
+                            </div>
+                            <span class="stat-trend-tag"><i class="fas fa-circle" style="font-size: 6px; color: var(--clinical-navy); vertical-align: middle; margin-right: 3px;"></i> Tiempo Real</span>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="live-clock-digits" id="currentTime">--:--:--</div>
+                            <div class="live-date-text" id="currentDate">Cargando fecha...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALENDARIO MENSUAL COMPLETO & MOTOR DE RECORDATORIOS WHATSAPP -->
+        <section class="agenda-wrapper fade-in-up" id="calendarSection">
+            <div class="calendar-header-bar">
+                <div class="calendar-title-group">
+                    <div class="agenda-title-badge">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Planificador Mensual & Recordatorios Automatizados</span>
+                    </div>
+                    <h2>Calendario de Citas, Estudios y Cirugías</h2>
+                    <p>Toque el botón de WhatsApp en cualquier paciente para enviar el recordatorio automatizado de su consulta, ecografía o cirugía.</p>
+                </div>
+
+                <div class="calendar-nav-toolbar">
+                    <div class="month-navigator">
+                        <button type="button" class="btn-cal-nav" id="btnPrevMonth" title="Mes Anterior">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="current-month-display">
+                            <i class="far fa-calendar-alt text-primary"></i>
+                            <span id="currentMonthYear">Octubre 2026</span>
+                        </div>
+
+                        <button type="button" class="btn-cal-nav" id="btnNextMonth" title="Mes Siguiente">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+
+                        <button type="button" class="btn-today-pill" id="btnGoToday">
+                            <i class="fas fa-calendar-day"></i> Hoy
+                        </button>
+                    </div>
+
+                    <button type="button" class="btn-action-primary" id="btnOpenNewApptModal">
+                        <i class="fas fa-calendar-plus"></i> Nueva Cita / Operación
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor Dual: Calendario Mensual (Izq) + Turnos del Día (Der) -->
+            <div class="calendar-dual-layout">
+                
+                <div class="calendar-month-card">
+                    <div class="calendar-weekdays-row">
+                        <span>LUN</span>
+                        <span>MAR</span>
+                        <span>MIÉ</span>
+                        <span>JUE</span>
+                        <span>VIE</span>
+                        <span>SÁB</span>
+                        <span>DOM</span>
+                    </div>
+
+                    <div class="calendar-days-grid" id="calendarDaysGrid"></div>
+
+                    <div class="calendar-footer-hint">
+                        <i class="fas fa-circle-info text-primary"></i>
+                        <span>Seleccione un día para gestionar sus turnos y enviar recordatorios de WhatsApp con un toque.</span>
+                    </div>
+                </div>
+
+                <div class="calendar-day-agenda-card">
+                    <div class="day-agenda-header">
+                        <div class="day-agenda-title-box">
+                            <span class="day-agenda-tag" id="dayAgendaTag">Día Seleccionado</span>
+                            <h3 id="selectedDateTitle">Martes, 13 de Octubre de 2026</h3>
+                            <p id="selectedDateSubtitle">Citas planificadas para este día</p>
+                        </div>
+                        <button type="button" class="btn-action-primary" id="btnAddApptForSelectedDay" style="padding: 7px 14px; font-size: 0.8rem;">
+                            <i class="fas fa-plus"></i> Agendar en esta fecha
+                        </button>
+                    </div>
+
+                    <!-- Filtros Rápidos por Especialidad -->
+                    <div class="day-agenda-filters">
+                        <button type="button" class="filter-chip active" data-filter="all">
+                            <span>Todas (<span id="countFilterAll">0</span>)</span>
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="prenatal">
+                            <i class="fas fa-baby"></i> <span>Prenatal (<span id="countFilterPrenatal">0</span>)</span>
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="ginecologia">
+                            <i class="fas fa-female"></i> <span>Ginecología (<span id="countFilterGyn">0</span>)</span>
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="colpo">
+                            <i class="fas fa-microscope"></i> <span>Colpo (<span id="countFilterColpo">0</span>)</span>
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="eco">
+                            <i class="fas fa-wave-square"></i> <span>Eco (<span id="countFilterEco">0</span>)</span>
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="cirugia">
+                            <i class="fas fa-user-doctor"></i> <span>Cirugía (<span id="countFilterCirugia">0</span>)</span>
+                        </button>
+                    </div>
+
+                    <div class="day-appointments-list" id="dayAppointmentsContainer"></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- CATÁLOGO DE 16 FORMATOS CLÍNICOS E INFORMES ESPECIALIZADOS -->
+        <section class="modules-section fade-in-up">
+            <div class="modules-header-bar" style="display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px;">
+                <div>
+                    <h2 class="modules-section-title" style="margin: 0;">Plantillas Clínicas, Informes y Certificados</h2>
+                </div>
+
+                <div class="format-search-wrapper" style="min-width: 320px; flex: 1; max-width: 520px;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="formatSearchInput" class="format-search-input" placeholder="Buscar plantilla (ej. eco, reposo, récipe)...">
+                    <span class="search-counter-badge" id="formatMatchCount">16 formatos</span>
+                </div>
+            </div>
+
+            <div class="modules-grid" id="modulesGridContainer">
+                
+                <!-- 1. HISTORIA CLÍNICA -->
+                <a href="historia_clinica.html" class="module-card" data-category="obstetricia" data-keywords="historia clinica control prenatal obstetrico cartilla consulta ginecologica anamnesis fpp">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-notes-medical"></i></div>
+                        <span class="module-badge">Principal</span>
+                    </div>
+                    <h3>Historia Clínica</h3>
+                    <p>Expediente clínico integral para Control Prenatal y Consulta Ginecológica con seguimiento de citas.</p>
+                    <div class="module-card-footer"><span>Abrir Historia Clínica</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 2. CARNET DE CONTROL PRENATAL -->
+                <a href="carnet_prenatal.html" class="module-card" data-category="obstetricia" data-keywords="carnet control prenatal cartilla rosada fisica oficial tablas consulta ecos labs recomendaciones">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-id-card-clip"></i></div>
+                        <span class="module-badge">Físico / Digital</span>
+                    </div>
+                    <h3>Carnet de Control Prenatal</h3>
+                    <p>Cartilla oficial de seguimiento gestacional con tablas de consulta, ecos, laboratorios y próximas citas.</p>
+                    <div class="module-card-footer"><span>Ver Carnet Oficial</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 3. REPOSO PRE Y POSTNATAL -->
+                <a href="reposo_prenatal_postnatal.html" class="module-card" data-category="obstetricia" data-keywords="reposo pre postnatal maternal descanso prenatal postnatal trabajadoras fpp semanas gestacion parto maternidad">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-person-breastfeeding"></i></div>
+                        <span class="module-badge">Obstetricia</span>
+                    </div>
+                    <h3>Reposo Pre y Postnatal</h3>
+                    <p>Certificado legal de descanso pre-natal (6 sem) y post-natal (12 sem) con cálculo automático desde FUR/FPP.</p>
+                    <div class="module-card-footer"><span>Emitir Reposo Maternal</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 4. INFORME DE COLPOSCOPIA -->
+                <a href="informe_colposcopia.html" class="module-card" data-category="procedimientos" data-keywords="informe colposcopia cervicovaginal cuello uterino acido acetico schiller lugol vasos biopsia vph">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-microscope"></i></div>
+                        <span class="module-badge">Colposcopia</span>
+                    </div>
+                    <h3>Informe de Colposcopia</h3>
+                    <p>Reporte cérvico-vaginal IFCPC con ácido acético, test de Schiller (Lugol), patrón vascular y biopsia.</p>
+                    <div class="module-card-footer"><span>Crear Reporte</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 5. COLPOSCOPIA - MONTAR IMÁGENES -->
+                <a href="colposcopia_imagenes.html" class="module-card" data-category="procedimientos" data-keywords="colposcopia montar imagenes fotografias fotos cervix test schiller acido acetico lamina impresa">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-images"></i></div>
+                        <span class="module-badge">Fotográfico</span>
+                    </div>
+                    <h3>Colposcopia — Montar Imágenes</h3>
+                    <p>Módulo interactivo para adjuntar 4 fotografías colposcópicas, horario cervical y generar lámina impresa.</p>
+                    <div class="module-card-footer"><span>Montar Fotografías</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 6. INFORME ECOGRÁFICO INTEGRAL -->
+                <a href="informe_ecografico.html" class="module-card" data-category="procedimientos" data-keywords="informe ecografico ginecologico obstetrica doppler genetico pelvica transvaginal mamaria biometria fetal">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-wave-square"></i></div>
+                        <span class="module-badge">Ecografía</span>
+                    </div>
+                    <h3>Informe Ecográfico Integral</h3>
+                    <p>Ecografía Transvaginal, Pélvica, Mamaria (BI-RADS) y Obstétrica Materno-Fetal (Biometría, PBF y Doppler).</p>
+                    <div class="module-card-footer"><span>Elaborar Ecografía</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 7. HISTEROSCOPIA -->
+                <a href="informe_histeroscopia.html" class="module-card" data-category="procedimientos" data-keywords="informe histeroscopia endoscopia canal cervical cavidad endometrial ostiums tubaricos polipos">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-magnifying-glass-plus"></i></div>
+                        <span class="module-badge">Endoscopia</span>
+                    </div>
+                    <h3>Informe de Histeroscopia</h3>
+                    <p>Evaluación endoscópica de canal cervical, cavidad uterina, endometrio, ostiums tubáricos y biopsia dirigida.</p>
+                    <div class="module-card-footer"><span>Ver Histeroscopia</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 8. RÉCIPE MÉDICO -->
+                <a href="recipe.html" class="module-card" data-category="recetario" data-keywords="recipe medico recetario indicaciones posologia prescripcion farmacos medicamentos vademecum">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-prescription"></i></div>
+                        <span class="module-badge">Recetario</span>
+                    </div>
+                    <h3>Récipe Médico</h3>
+                    <p>Emisión de récipes e indicaciones conectado al vademécum LiteFarma con autocompletado de dosis y posología.</p>
+                    <div class="module-card-footer"><span>Elaborar Récipe</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 9. SOLICITUD DE LABORATORIOS -->
+                <a href="solicitud_laboratorios.html" class="module-card" data-category="recetario" data-keywords="solicitud laboratorios orden medica bioanalisis perfiles prenatales torch glucosa hormonas cultivos">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-vial-virus"></i></div>
+                        <span class="module-badge">Bioanálisis</span>
+                    </div>
+                    <h3>Solicitud de Laboratorios</h3>
+                    <p>Orden médica interactiva por perfiles: Prenatal, TORCH, Metabólico, Hormonal, Preoperatorio y Cultivos.</p>
+                    <div class="module-card-footer"><span>Solicitar Exámenes</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 10. INFORME MÉDICO GENERAL -->
+                <a href="informe_medico.html" class="module-card" data-category="recetario" data-keywords="informe medico clinico oficial detallado diagnostico evolucion plan terapeutico">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-file-medical"></i></div>
+                        <span class="module-badge">Clínico</span>
+                    </div>
+                    <h3>Informe Médico</h3>
+                    <p>Informe clínico detallado con enfermedad actual, antecedentes, examen físico, estudios y plan terapéutico.</p>
+                    <div class="module-card-footer"><span>Generar Informe</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 11. MÓDULO DE REPOSOS (HUB) -->
+                <a href="reposos.html" class="module-card" data-category="tramites" data-keywords="modulo reposos centro gestion reposos medicos emision historial verificacion pdf">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-bed-pulse"></i></div>
+                        <span class="module-badge">Reposos</span>
+                    </div>
+                    <h3>Módulo de Reposos</h3>
+                    <p>Centro de gestión e historial de reposos médicos y licencias pre/postnatales emitidas.</p>
+                    <div class="module-card-footer"><span>Gestionar Reposos</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 12. REPOSO MÉDICO DIRECTO -->
+                <a href="reposo_medico.html" class="module-card" data-category="tramites" data-keywords="reposo medico certificacion dias reposo continuo letras numeros diagnostico reintegro">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-file-signature"></i></div>
+                        <span class="module-badge">Reposo</span>
+                    </div>
+                    <h3>Reposo Médico</h3>
+                    <p>Certificación de días de reposo continuo en letras y números con cálculo automático de fecha de reintegro.</p>
+                    <div class="module-card-footer"><span>Emitir Reposo</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 13. PRESUPUESTO QUIRÚRGICO -->
+                <a href="presupuesto_quirurgico.html" class="module-card" data-category="tramites" data-keywords="presupuesto quirurgico cirugia cotizacion cesareas histerectomias laparoscopias costos">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <span class="module-badge">Cirugía</span>
+                    </div>
+                    <h3>Presupuesto Quirúrgico</h3>
+                    <p>Cotización para cesáreas, histerectomías y laparoscopias con envío de programación quirúrgica por WhatsApp.</p>
+                    <div class="module-card-footer"><span>Cotizar Cirugía</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 14. REFERENCIA MÉDICA -->
+                <a href="referencia.html" class="module-card" data-category="tramites" data-keywords="referencia medica interconsulta especialistas perinatologia oncologia cardiologia">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-share-nodes"></i></div>
+                        <span class="module-badge">Interconsulta</span>
+                    </div>
+                    <h3>Referencia Médica</h3>
+                    <p>Hoja de interconsulta dirigida a subespecialistas con resumen clínico, paraclínicos y presunción diagnóstica.</p>
+                    <div class="module-card-footer"><span>Emitir Referencia</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 15. CONSTANCIA MÉDICA -->
+                <a href="constancia.html" class="module-card" data-category="tramites" data-keywords="constancia medica certificado asistencia consulta gravidez viajes aereos aerolineas">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-award"></i></div>
+                        <span class="module-badge">Certificado</span>
+                    </div>
+                    <h3>Constancia Médica</h3>
+                    <p>Certificados de asistencia, estado de gravidez, buena salud ginecológica y aptitud de vuelo en aerolíneas.</p>
+                    <div class="module-card-footer"><span>Generar Constancia</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <!-- 16. INFORME DE EGRESO -->
+                <a href="informe_egreso.html" class="module-card" data-category="tramites" data-keywords="informe egreso epicrisis alta medica postquirurgica hospitalaria recien nacido">
+                    <div class="module-card-top">
+                        <div class="module-card-icon"><i class="fas fa-door-open"></i></div>
+                        <span class="module-badge">Epicrisis</span>
+                    </div>
+                    <h3>Informe de Egreso</h3>
+                    <p>Epicrisis de alta post-quirúrgica u obstétrica con datos neonatales, tratamiento y cita control por WhatsApp.</p>
+                    <div class="module-card-footer"><span>Elaborar Egreso</span><i class="fas fa-arrow-right"></i></div>
+                </a>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: NUEVA CITA / CIRUGÍA CON ENVÍO DE RECORDATORIO WHATSAPP -->
+    <div class="modal-backdrop" id="modalNewAppt">
+        <div class="modal-box modal-box-appointment">
+            <div class="modal-header">
+                <div class="modal-header-title-group">
+                    <div class="modal-icon-badge">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <div>
+                        <h2>Agendar Cita, Estudio o Cirugía</h2>
+                        <p class="modal-header-sub">Dr. Christian A. Rodríguez C. &bull; Recordatorio WhatsApp Automatizado</p>
+                    </div>
+                </div>
+                <button type="button" class="modal-close-btn" id="btnCloseApptModal" title="Cerrar">&times;</button>
+            </div>
+
+            <form id="formNewAppointment">
+                <div class="modal-body modal-body-appt">
+                    
+                    <div class="modal-section-title">
+                        <i class="fas fa-user-check text-primary"></i>
+                        <span>Datos de la Paciente</span>
+                    </div>
+
+                    <div class="modal-item modal-item-full">
+                        <label for="apptPatientName">Nombre y Apellido de la Paciente *</label>
+                        <div class="input-with-icon">
+                            <i class="far fa-user input-icon"></i>
+                            <input type="text" id="apptPatientName" required placeholder="Ej: Mariana Sofia Gomez">
+                        </div>
+                    </div>
+
+                    <div class="modal-item">
+                        <label for="apptCedula">Cédula de Identidad *</label>
+                        <div class="input-with-icon">
+                            <i class="far fa-id-card input-icon"></i>
+                            <input type="text" id="apptCedula" required placeholder="Ej: V-25.489.123">
+                        </div>
+                    </div>
+
+                    <div class="modal-item">
+                        <label for="apptPhone">Teléfono / WhatsApp *</label>
+                        <div class="input-with-icon">
+                            <i class="fab fa-whatsapp input-icon" style="color: #16a34a;"></i>
+                            <input type="tel" id="apptPhone" required placeholder="Ej: 0414-1234567">
+                        </div>
+                    </div>
+
+                    <div class="modal-section-title">
+                        <span>Tipo de Atención o Procedimiento</span>
+                    </div>
+
+                    <div class="modal-item">
+                        <label for="apptDate">Fecha Programada *</label>
+                        <div class="input-with-icon">
+                            <i class="far fa-calendar-alt input-icon"></i>
+                            <input type="date" id="apptDate" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-item">
+                        <label for="apptType">Motivo / Acto Médico *</label>
+                        <select id="apptType" required>
+                            <option value="prenatal">Control Prenatal (Embarazada)</option>
+                            <option value="ginecologia">Consulta Ginecológica General</option>
+                            <option value="eco">Ecografía (Obstétrica / Transvaginal / Pélvica / Mamaria)</option>
+                            <option value="colpo">Colposcopia y Citología</option>
+                            <option value="histeroscopia">Histeroscopia Diagnóstica / Quirúrgica</option>
+                            <option value="cirugia">Cirugía / Cesárea / Intervención Quirúrgica</option>
+                            <option value="postoperatorio">Control Postoperatorio / Retiro de Puntos</option>
+                            <option value="revision">Revisión de Laboratorios y Biopsias</option>
+                        </select>
+                    </div>
+
+                    <!-- RELOJ CLÍNICO INTERACTIVO -->
+                    <div class="modal-item modal-item-full">
+                        <div class="clock-picker-container">
+                            <div class="clock-picker-header">
+                                <div class="clock-header-left">
+                                    <span class="clock-badge-tag">Selector de Hora</span>
+                                    <h4>Organizador de Turnos y Horario</h4>
+                                </div>
+                                <div class="clock-display-badge">
+                                    <span class="clock-display-time" id="clockDisplayTime">09:00</span>
+                                    <span class="clock-display-period" id="clockDisplayPeriod">AM</span>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="apptTime" name="apptTime" value="09:00" required>
+
+                            <div class="clock-picker-body">
+                                <div class="clock-analog-card">
+                                    <div class="clock-face-dial" id="clockFaceDial">
+                                        <svg class="clock-hands-svg" viewBox="0 0 170 170" width="170" height="170">
+                                            <circle cx="85" cy="85" r="76" class="clock-svg-bezel" />
+                                            <line x1="85" y1="85" x2="85" y2="46" class="clock-svg-hand-hour" id="clockSvgHourHand" />
+                                            <line x1="85" y1="85" x2="85" y2="28" class="clock-svg-hand-minute" id="clockSvgMinuteHand" />
+                                            <circle cx="85" cy="85" r="5.5" class="clock-svg-center-pin" />
+                                            <circle cx="85" cy="85" r="2" class="clock-svg-center-dot" />
+                                        </svg>
+
+                                        <button type="button" class="clock-hour-btn" data-hour="12" style="left: 85px; top: 23px;">12</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="1" style="left: 116px; top: 31px;">1</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="2" style="left: 139px; top: 54px;">2</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="3" style="left: 147px; top: 85px;">3</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="4" style="left: 139px; top: 116px;">4</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="5" style="left: 116px; top: 139px;">5</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="6" style="left: 85px; top: 147px;">6</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="7" style="left: 54px; top: 139px;">7</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="8" style="left: 31px; top: 116px;">8</button>
+                                        <button type="button" class="clock-hour-btn active" data-hour="9" style="left: 23px; top: 85px;">9</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="10" style="left: 31px; top: 54px;">10</button>
+                                        <button type="button" class="clock-hour-btn" data-hour="11" style="left: 54px; top: 31px;">11</button>
+                                    </div>
+                                    <div class="clock-hint-text">
+                                        <i class="fas fa-hand-pointer"></i> Toque una hora para ajustar
+                                    </div>
+                                </div>
+
+                                <div class="clock-controls-card">
+                                    <div class="clock-period-segmented">
+                                        <button type="button" class="btn-period active" data-period="AM" id="btnPeriodAM">
+                                            <i class="fas fa-sun"></i> Mañana (AM)
+                                        </button>
+                                        <button type="button" class="btn-period" data-period="PM" id="btnPeriodPM">
+                                            <i class="fas fa-moon"></i> Tarde (PM)
+                                        </button>
+                                    </div>
+
+                                    <div class="clock-subgroup">
+                                        <span class="clock-subgroup-label">Minutos:</span>
+                                        <div class="clock-minute-chips">
+                                            <button type="button" class="btn-min-chip active" data-min="00">:00</button>
+                                            <button type="button" class="btn-min-chip" data-min="15">:15</button>
+                                            <button type="button" class="btn-min-chip" data-min="30">:30</button>
+                                            <button type="button" class="btn-min-chip" data-min="45">:45</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="clock-subgroup">
+                                        <span class="clock-subgroup-label">Turnos Rápidos:</span>
+                                        <div class="clock-slots-grid">
+                                            <button type="button" class="btn-time-slot" data-hour="8" data-min="30" data-period="AM">08:30 AM</button>
+                                            <button type="button" class="btn-time-slot active" data-hour="9" data-min="00" data-period="AM">09:00 AM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="9" data-min="30" data-period="AM">09:30 AM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="10" data-min="00" data-period="AM">10:00 AM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="10" data-min="30" data-period="AM">10:30 AM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="11" data-min="00" data-period="AM">11:00 AM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="2" data-min="00" data-period="PM">02:00 PM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="2" data-min="30" data-period="PM">02:30 PM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="3" data-min="00" data-period="PM">03:00 PM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="3" data-min="30" data-period="PM">03:30 PM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="4" data-min="00" data-period="PM">04:00 PM</button>
+                                            <button type="button" class="btn-time-slot" data-hour="4" data-min="30" data-period="PM">04:30 PM</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-item modal-item-full">
+                        <label for="apptNotes">Indicaciones / Observaciones Específicas para la Paciente</label>
+                        <textarea id="apptNotes" rows="2" placeholder="Ej: Asistir en ayunas, traer perfil preoperatorio, semana gestacional..."></textarea>
+                    </div>
+
+                    <div class="modal-item modal-item-full">
+                        <label class="lab-item-check" style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 14px; border-radius: 8px; color: #166534; font-weight: 600;">
+                            <input type="checkbox" id="apptSendWhatsAppNow" checked>
+                            <span><i class="fab fa-whatsapp"></i> Abrir WhatsApp automáticamente con el recordatorio personalizado al guardar</span>
+                        </label>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-action btn-action-secondary" id="btnCancelAppt">Cancelar</button>
+                    <button type="submit" class="btn-action btn-action-primary">
+                        <i class="fas fa-check"></i> Guardar y Confirmar Turno
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 22px; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); background: #ffffff;">
+        Desarrollado por <strong>Keyth Leon</strong>
+    </footer>
+
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/dashboard.js?v=7.0"></script>
+</body>
+
+</html>

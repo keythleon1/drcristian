@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Informe Ecográfico Integral</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+            <a href="dashboard.html" class="btn-action btn-action-secondary">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+            <button type="button" id="btnLogout" class="btn-logout-header">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Informe Ecográfico</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="ecoPatientSelect" title="Cargar datos de la paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnFillNormalEco" title="Autocompletar hallazgos normales según tipo de eco">
+                    <i class="fas fa-wand-magic-sparkles"></i> Plantilla Normal
+                </button>
+                <button type="button" class="btn-action-util" id="btnClearEco" title="Limpiar informe">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadEcoPDF" title="Descargar informe oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveEco" title="Guardar informe ecográfico">
+                    <i class="fas fa-floppy-disk"></i> Guardar Ecografía
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL DE ECOGRAFÍA (1 SOLA PÁGINA CARTA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableEcoSheet">
+
+            <!-- Membrete Oficial Dinámico -->
+            <div class="medical-letterhead">
+            <div class="letterhead-elegant-wrapper">
+                <div class="letterhead-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                    <div class="letterhead-doctor-info">
+                        <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                        <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                        <div class="letterhead-doc-contact-inline">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="letterhead-doc-badge-box">
+                    <div class="letterhead-doc-badge" id="ecoReportTitle">INFORME DE ECOGRAFÍA TRANSVAGINAL</div>
+                </div>
+            </div>
+        </div>
+
+        <form id="formEcoReport">
+            
+            <!-- Datos de la Paciente y Tipo de Estudio -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Modalidad Ecográfica y Filiación de la Paciente</span>
+                    </h3>
+                    <span class="badge-tag">Ultrasonido</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-4">
+                        <label>Tipo de Estudio Ecográfico *</label>
+                        <select id="ecoTipoEstudio">
+                            <option value="transvaginal">Ecografía Transvaginal Ginecológica</option>
+                            <option value="pelvica">Ecografía Pélvica Ginecológica</option>
+                            <option value="obstetrica">Ecografía Obstétrica / Perfil Biofísico y Doppler</option>
+                            <option value="mamaria">Ecografía Mamaria Bilateral (BI-RADS)</option>
+                        </select>
+                    </div>
+                    <div class="form-field col-5">
+                        <label>Nombre y Apellido *</label>
+                        <input type="text" id="ecoNombre" required placeholder="Nombre completo de la paciente">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Cédula de Identidad *</label>
+                        <input type="text" id="ecoCedula" required placeholder="V-00.000.000">
+                    </div>
+                    <div class="form-field col-2">
+                        <label>Edad</label>
+                        <input type="number" id="ecoEdad" placeholder="Años">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Fecha del Estudio *</label>
+                        <input type="date" id="ecoFecha" required>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>FUR (Fecha Última Regla)</label>
+                        <input type="date" id="ecoFUR">
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Motivo del Estudio</label>
+                        <input type="text" id="ecoMotivo" placeholder="Control prenatal / Dolor pélvico / Chequeo ginecológico">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 1: ÚTERO Y ENDOMETRIO (Ginecológica) -->
+            <section class="clinical-card fade-in-up" id="secEcoUtero">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Evaluación de Útero, Miometrio y Endometrio</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-3">
+                        <label>Posición Uterina:</label>
+                        <select id="ecoUteroPosicion">
+                            <option value="AVF">Anteversoflexión (AVF)</option>
+                            <option value="RVF">Retroversoflexión (RVF)</option>
+                            <option value="Indiferente">Posición Indiferente</option>
+                        </select>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Dimensiones Útero (L x AP x T mm):</label>
+                        <input type="text" id="ecoUteroMedidas" placeholder="Ej: 75 x 42 x 38 mm">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Volumen Uterino Estimado:</label>
+                        <input type="text" id="ecoUteroVol" placeholder="Ej: 62.8 cc">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Ecoestructura Miometrial:</label>
+                        <input type="text" id="ecoMiometrio" placeholder="Homogénea / Sin lesiones focales">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label>Espesor Endometrial (mm):</label>
+                        <input type="text" id="ecoEndometrioEspesor" placeholder="Ej: 7.5 mm">
+                    </div>
+                    <div class="form-field col-9">
+                        <label>Patrón Endometrial y Línea Cavitaria:</label>
+                        <input type="text" id="ecoEndometrioPatron" placeholder="Trilaminar proliferativo, homogéneo, regular, sin imágenes polipoideas ni colecciones">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: ANEXOS Y FONDO DE SACO (Ginecológica) -->
+            <section class="clinical-card fade-in-up" id="secEcoAnexos">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Anexos Ováricos y Fondo de Saco de Douglas</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Ovario Derecho (Medidas y Descripción):</label>
+                        <textarea id="ecoOvarioDer" rows="2" placeholder="Dimensiones: 32 x 20 x 18 mm. Volumen: 6.0 cc. Estroma homogéneo, recuento folicular normal para la edad. Sin masas quísticas ni sólidas."></textarea>
+                    </div>
+                    <div class="form-field col-6">
+                        <label>Ovario Izquierdo (Medidas y Descripción):</label>
+                        <textarea id="ecoOvarioIzq" rows="2" placeholder="Dimensiones: 30 x 19 x 17 mm. Volumen: 5.1 cc. Morfología conservada, folículos periféricos normales."></textarea>
+                    </div>
+                    <div class="form-field col-12">
+                        <label>Fondo de Saco de Douglas / Espacio Rectouterino:</label>
+                        <input type="text" id="ecoDouglas" placeholder="Libre, sin presencia de líquido libre ni colecciones patológicas.">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: ECOGRAFÍA OBSTÉTRICA / MATERNO-FETAL (Biometría, Placenta, LA y Doppler) -->
+            <section class="clinical-card fade-in-up" id="secEcoObstetrica" style="display: none;">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Biometría Fetal, Vitalidad, Placenta y Flujometría Doppler</span>
+                    </h3>
+                    <span class="badge-tag">Materno-Fetal</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-3">
+                        <label>Número y Vitalidad:</label>
+                        <input type="text" id="ecoObsVitalidad" value="Feto único vivo activo">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Situación y Presentación:</label>
+                        <select id="ecoObsPresentacion">
+                            <option value="Longitudinal Cefálica">Longitudinal Cefálica</option>
+                            <option value="Longitudinal Podálica">Longitudinal Podálica</option>
+                            <option value="Transversa">Situación Transversa</option>
+                            <option value="Indiferente (I Trimestre)">Indiferente (I Trimestre)</option>
+                        </select>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Dorso Fetal:</label>
+                        <select id="ecoObsDorso">
+                            <option value="Derecho">Dorso Derecho</option>
+                            <option value="Izquierdo">Dorso Izquierdo</option>
+                            <option value="Anterior">Dorso Anterior</option>
+                            <option value="Posterior">Dorso Posterior</option>
+                        </select>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>FCF (Latidos por minuto):</label>
+                        <input type="text" id="ecoObsFCF" placeholder="Ej: 146 lpm (Rítmico)">
+                    </div>
+
+                    <!-- Biometría Fetal -->
+                    <div class="form-field col-2">
+                        <label>DBP (mm):</label>
+                        <input type="text" id="ecoObsDBP" placeholder="Ej: 64 mm">
+                    </div>
+                    <div class="form-field col-2">
+                        <label>C.C (mm):</label>
+                        <input type="text" id="ecoObsCC" placeholder="Ej: 230 mm">
+                    </div>
+                    <div class="form-field col-2">
+                        <label>C.A (mm):</label>
+                        <input type="text" id="ecoObsCA" placeholder="Ej: 205 mm">
+                    </div>
+                    <div class="form-field col-2">
+                        <label>L.F (mm):</label>
+                        <input type="text" id="ecoObsLF" placeholder="Ej: 46 mm">
+                    </div>
+                    <div class="form-field col-2">
+                        <label>Peso Fetal (PFE g):</label>
+                        <input type="text" id="ecoObsPeso" placeholder="Ej: 780 g (P50)">
+                    </div>
+                    <div class="form-field col-2">
+                        <label>Edad Gestacional Eco:</label>
+                        <input type="text" id="ecoObsEGE" placeholder="Ej: 25 sem + 2 d">
+                    </div>
+
+                    <!-- Placenta, Líquido Amniótico y Perfil Biofísico -->
+                    <div class="form-field col-4">
+                        <label>Placenta (Inserción y Grado Grannum):</label>
+                        <input type="text" id="ecoObsPlacenta" placeholder="Ej: Corporal anterior normoinserta, Grado I/III">
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Líquido Amniótico (ILA / Bolsillo Mayor):</label>
+                        <input type="text" id="ecoObsLA" placeholder="Ej: Volumen normal, ILA: 13.5 cm">
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Perfil Biofísico Fetal / Longitud Cervical:</label>
+                        <input type="text" id="ecoObsPBF" placeholder="Ej: PBF 8/8 puntos • Cervix: 36 mm cerrado">
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label>Anatomía Fetal y Flujometría Doppler (Arteria Umbilical, ACM, Ductus, Uterinas):</label>
+                        <textarea id="ecoObsDoppler" rows="2" placeholder="Anatomía fetal valorada sin malformaciones evidentes. Flujometría Doppler feto-placentaria con índices de pulsatilidad dentro de percentiles normales."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 4: ECOGRAFÍA MAMARIA (BI-RADS) -->
+            <section class="clinical-card fade-in-up" id="secEcoMama" style="display: none;">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Ecografía Mamaria Bilateral y Regiones Axilares</span>
+                    </h3>
+                    <span class="badge-tag">BI-RADS</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Mama Derecha:</label>
+                        <textarea id="ecoMamaDer" rows="3" placeholder="Piel y complejo areola-pezón normales. Tejido fibroglandular homogéneo. No se aprecian nódulos sólidos ni quísticos sospechosos. Región axilar sin adenopatías."></textarea>
+                    </div>
+                    <div class="form-field col-6">
+                        <label>Mama Izquierda:</label>
+                        <textarea id="ecoMamaIzq" rows="3" placeholder="Piel y pezón de características normales. Arquitectura mamaria conservada. Sin distorsiones parenquimatosas. Axila izquierda libre."></textarea>
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Clasificación BI-RADS:</label>
+                        <select id="ecoBirads">
+                            <option value="BI-RADS 1">BI-RADS 1 (Negativo / Normal)</option>
+                            <option value="BI-RADS 2">BI-RADS 2 (Hallazgos Benignos)</option>
+                            <option value="BI-RADS 3">BI-RADS 3 (Probablemente Benigno - Control 6m)</option>
+                            <option value="BI-RADS 4">BI-RADS 4 (Sospecha de Malignidad - Biopsia)</option>
+                            <option value="BI-RADS 0">BI-RADS 0 (Estudio Incompleto)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conclusión Diagnóstica y Sugerencias -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Conclusión Diagnóstica Ecográfica y Conducta</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label>Conclusión Diagnóstica *</label>
+                        <textarea id="ecoConclusion" rows="3" required placeholder="1. ÚTERO Y OVARIOS ECOGRÁFICAMENTE DENTRO DE LÍMITES NORMALES PARA LA EDAD Y FASE DEL CICLO.&#10;2. FONDO DE SACO DE DOUGLAS LIBRE."></textarea>
+                    </div>
+                    <div class="form-field col-12">
+                        <label>Sugerencias Médicas:</label>
+                        <textarea id="ecoSugerencias" rows="2" placeholder="Correlación clínica y control ecográfico periódico según indicación médica."></textarea>
+                    </div>
+                </div>
+            </section>
+
+        </form>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+
+        </div> <!-- Fin de #printableEcoSheet -->
+    </div>
+
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/informe_ecografico.js?v=7.0"></script>
+</body>
+
+</html>

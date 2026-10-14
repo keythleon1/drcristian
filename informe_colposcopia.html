@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Informe de Colposcopia</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="colposcopia_imagenes.html" class="btn-action-util" title="Montar o ver imágenes del estudio colposcópico">
+                <i class="fas fa-camera"></i> Montar Imágenes
+            </a>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Informe de Colposcopia</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="colpoPatientSelect" title="Cargar datos de la paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearColpo" title="Limpiar informe">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadColpoPDF" title="Descargar informe oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveColpo" title="Guardar informe de colposcopia">
+                    <i class="fas fa-floppy-disk"></i> Guardar Colposcopia
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL DE COLPOSCOPIA (1 PÁGINA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableColpoSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+            <div class="letterhead-elegant-wrapper">
+                <div class="letterhead-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                    <div class="letterhead-doctor-info">
+                        <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                        <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                        <div class="letterhead-doc-contact-inline">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="letterhead-doc-badge-box">
+                    <div class="letterhead-doc-badge" id="colpoDocTitle">INFORME COLPOSCÓPICO OFICIAL</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario Colposcópico -->
+        <form id="formColpoReport">
+            
+            <!-- Datos de Paciente -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Datos de la Paciente y Antecedentes</span>
+                    </h3>
+                    <span class="badge-tag badge-tag-purple">Filiación</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Nombre y Apellido *</label>
+                        <input type="text" id="colpoNombre" required placeholder="Nombre de la paciente">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Cédula de Identidad *</label>
+                        <input type="text" id="colpoCedula" required placeholder="V-00.000.000">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Edad</label>
+                        <input type="number" id="colpoEdad" placeholder="Años">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Fecha de Evaluación *</label>
+                        <input type="date" id="colpoFecha" required>
+                    </div>
+                    <div class="form-field col-3">
+                        <label>FUR:</label>
+                        <input type="date" id="colpoFUR">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Paridad (Gesta/Partos):</label>
+                        <input type="text" id="colpoParidad" placeholder="G: P: C: A:">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Citología Previa:</label>
+                        <input type="text" id="colpoCitologia" placeholder="NILM / ASCUS / LIEBG / LIEAG">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Evaluación del Cuello Uterino y Zona de Transformación -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Evaluación Colposcópica Cervicouterina (Criterios IFCPC)</span>
+                    </h3>
+                    <span class="badge-tag badge-tag-purple">Cérvix</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-4">
+                        <label>Adecuación del Examen:</label>
+                        <select id="colpoAdecuacion">
+                            <option value="Satisfactoria">Satisfactoria (Cérvix completamente visible)</option>
+                            <option value="No Satisfactoria">No Satisfactoria (Inflamación severa / Hemorragia)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label>Unión Escamo-Columnar (UEC):</label>
+                        <select id="colpoUEC">
+                            <option value="Tipo 1">Completamente visible en ectocérvix (Tipo 1)</option>
+                            <option value="Tipo 2">Parcialmente visible / Componente endocervical (Tipo 2)</option>
+                            <option value="Tipo 3">No visible / Canal endocervical profundo (Tipo 3)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label>Zona de Transformación (ZT):</label>
+                        <input type="text" id="colpoZT" placeholder="Normal / Ectopia / Metaplasia escamosa">
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label>Prueba de Ácido Acético al 3-5%:</label>
+                        <textarea id="colpoAcido" rows="2" placeholder="Negativa para lesión acetoblanca / Epitelio acetoblanco tenue o denso con bordes regulares/irregulares."></textarea>
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label>Test de Schiller (Solución de Lugol):</label>
+                        <textarea id="colpoSchiller" rows="2" placeholder="Yodopositivo homogéneo caoba (Negativo para atipia) / Área yodonegativa mostaza bien delimitada."></textarea>
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label>Patrón Vascular:</label>
+                        <select id="colpoVasos">
+                            <option value="Vasos finos regulares normales">Vasos finos regulares normales</option>
+                            <option value="Punteado fino (Grado 1)">Punteado fino (Grado 1)</option>
+                            <option value="Punteado grueso (Grado 2)">Punteado grueso (Grado 2)</option>
+                            <option value="Mosaico fino (Grado 1)">Mosaico fino (Grado 1)</option>
+                            <option value="Mosaico grueso (Grado 2)">Mosaico grueso (Grado 2)</option>
+                            <option value="Vasos atípicos / Bizarros">Vasos atípicos / Bizarros</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label>Otros Hallazgos Colposcópicos:</label>
+                        <input type="text" id="colpoOtrosHallazgos" placeholder="Leucoplasia, Condiloma, Erosión, Pólipo">
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label>Toma de Biopsia Dirigida:</label>
+                        <input type="text" id="colpoBiopsia" placeholder="No se toma / Sí, en radio horario 12 y 6">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conclusión Diagnóstica y Conducta Médica -->
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Diagnóstico Colposcópico y Conducta Terapéutica</span>
+                    </h3>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-12">
+                        <label>Impresión Diagnóstica Colposcópica *</label>
+                        <textarea id="colpoDiagnostico" rows="3" required placeholder="1. CUELLO UTERINO COLPOSCÓPICAMENTE NORMAL SIN SIGNOS DE MALIGNIDAD NI LESIÓN INTRAEPITELIAL.&#10;2. ZONA DE TRANSFORMACIÓN TIPO 1.&#10;3. CERVICITIS CRÓNICA INESPECÍFICA."></textarea>
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label>Conducta y Recomendaciones Médicas *</label>
+                        <textarea id="colpoConducta" rows="3" required placeholder="1. Tratamiento médico tópico para cervicitis.&#10;2. Control citológico y colposcópico preventivo en 12 meses.&#10;3. Mantener medidas de higiene y salud ginecológica."></textarea>
+                    </div>
+                </div>
+            </section>
+
+        </form>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+
+        </div> <!-- Fin de #printableColpoSheet -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/informe_colposcopia.js?v=7.0"></script>
+</body>
+
+</html>

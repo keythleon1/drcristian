@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Certificado de Reposo Médico</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js para descarga directa de PDF -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="reposos.html" class="btn-action btn-action-secondary" title="Volver al Centro de Reposos">
+                <i class="fas fa-arrow-left"></i> Centro de Reposos
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra Superior de Acciones y Selector Rápido de Paciente -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="reposos.html">Reposos</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Reposo Médico</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="repMedPatientSelect" title="Cargar datos de paciente registrada">
+                        <option value="">-- Cargar Paciente --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-action-util" id="btnClearRepMed" title="Limpiar constancia">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadRepMedPDF" title="Descargar constancia oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveRepMed" title="Guardar constancia de reposo">
+                    <i class="fas fa-floppy-disk"></i> Guardar Reposo
+                </button>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             HOJA EJECUTIVA OFICIAL DE REPOSO MÉDICO (1 PÁGINA)
+             ============================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableRepMedSheet">
+
+            <!-- Membrete Oficial para Impresión -->
+            <div class="medical-letterhead">
+            <div class="letterhead-elegant-wrapper">
+                <div class="letterhead-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="letterhead-logo-img">
+                    <div class="letterhead-doctor-info">
+                        <h1 class="letterhead-doc-name">Dr. Christian A. Rodríguez C.</h1>
+                        <h2 class="letterhead-doc-credentials">GINECOLOGÍA Y OBSTETRICIA - MPPS: 96.430 - CMG: 4232 - RIF: V-18288931-4</h2>
+                        <div class="letterhead-doc-contact-inline">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="letterhead-doc-badge-box">
+                    <div class="letterhead-doc-badge" id="rmDocTitleBadge">CONSTANCIA DE REPOSO MÉDICO</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de Reposo Médico -->
+        <form id="formReposoMedico">
+            
+            <section class="clinical-card fade-in-up">
+                <div class="clinical-card-header">
+                    <h3 class="clinical-card-title">
+                        <span>Datos de la Paciente y Duración del Reposo</span>
+                    </h3>
+                    <span class="badge-tag badge-tag-amber">Laboral</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field col-6">
+                        <label>Nombre y Apellido de la Paciente *</label>
+                        <input type="text" id="rmNombre" required placeholder="Nombre completo">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Cédula de Identidad *</label>
+                        <input type="text" id="rmCedula" required placeholder="V-00.000.000">
+                    </div>
+                    <div class="form-field col-3">
+                        <label>Edad</label>
+                        <input type="number" id="rmEdad" placeholder="Años">
+                    </div>
+
+                    <div class="form-field col-6">
+                        <label>Empresa / Institución / Ocupación:</label>
+                        <input type="text" id="rmEmpresa" placeholder="Empresa o lugar de trabajo">
+                    </div>
+                    <div class="form-field col-6">
+                        <label>Fecha de Emisión *</label>
+                        <input type="date" id="rmFechaEmision" required>
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label>Diagnóstico Médico Concluyente *</label>
+                        <input type="text" id="rmDiagnostico" required placeholder="Ej: Amenaza de aborto / Cervicovaginitis severa / Postoperatorio inmediato de conización">
+                    </div>
+
+                    <div class="form-field col-3">
+                        <label>Días de Reposo (Número):</label>
+                        <input type="number" id="rmDiasNumero" min="1" value="3" required>
+                    </div>
+                    <div class="form-field col-5">
+                        <label>Días en Letras:</label>
+                        <input type="text" id="rmDiasLetras" value="TRES (03) DÍAS CONTINUOS" required>
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Tipo de Reposo:</label>
+                        <select id="rmTipoReposo">
+                            <option value="Absoluto en cama">Reposo Absoluto en Cama</option>
+                            <option value="Relativo en domicilio" selected>Reposo Relativo en Domicilio</option>
+                            <option value="Médico laboral">Reposo Médico Laboral</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field col-4">
+                        <label>Fecha de Inicio (Desde):</label>
+                        <input type="date" id="rmFechaInicio" required>
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Fecha de Culminación (Hasta):</label>
+                        <input type="date" id="rmFechaFin" required>
+                    </div>
+                    <div class="form-field col-4">
+                        <label>Fecha de Reintegro Laboral:</label>
+                        <input type="date" id="rmFechaReintegro">
+                    </div>
+
+                    <div class="form-field col-12">
+                        <label>Observaciones y Pautas Médicas:</label>
+                        <textarea id="rmObservaciones" rows="3" placeholder="Se sugiere evitar traslados largos, bipedestación prolongada y esfuerzos físicos. Deberá acudir a reevaluación médica al término del presente reposo."></textarea>
+                    </div>
+                </div>
+            </section>
+
+        </form>
+
+        <!-- Pie de Documento con Firma -->
+        <div class="medical-doc-footer" style="justify-content: flex-end;">
+            <div class="signature-stamp-box">
+                <div class="signature-line"></div>
+                <div class="doc-stamp-title">Firma del Médico Tratante</div>
+            </div>
+        </div>
+
+        </div> <!-- Fin de #printableRepMedSheet -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/reposo_medico.js?v=7.0"></script>
+</body>
+
+</html>

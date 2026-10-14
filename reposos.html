@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Centro de Reposos Médicos</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header Principal Minimalista — Estética Skylearn -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <!-- Estado del Sistema -->
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="dashboard.html" class="btn-action btn-action-secondary" title="Volver al Panel Principal">
+                <i class="fas fa-arrow-left"></i> Volver al Panel
+            </a>
+
+            <!-- Cerrar Sesión -->
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Encabezado de la Sección y Acciones -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Centro de Reposos Médicos</span>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <a href="reposo_medico.html" class="btn-action-save" title="Emitir nuevo reposo médico general">
+                    <i class="fas fa-file-signature"></i> Nuevo Reposo Médico
+                </a>
+                <a href="reposo_prenatal_postnatal.html" class="btn-action-util" title="Emitir nuevo reposo pre y postnatal">
+                    <i class="fas fa-baby-carriage"></i> Reposo Pre y Postnatal
+                </a>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Acceso Rápido a Tipos de Reposo -->
+        <div class="modules-grid fade-in-up" style="margin-bottom: 32px;">
+            <a href="reposo_medico.html" class="module-card module-amber">
+                <div class="module-card-top">
+                    <div class="module-card-icon amber">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <span class="module-badge amber">Reposo General</span>
+                </div>
+                <h3>Reposo Médico</h3>
+                <p>Certificación médica laboral con especificación de días en letras y números, diagnóstico y fecha de reintegro.</p>
+                <div class="module-card-footer amber">
+                    <span>Emitir Formato</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a href="reposo_prenatal_postnatal.html" class="module-card module-rose">
+                <div class="module-card-top">
+                    <div class="module-card-icon rose">
+                        <i class="fas fa-person-breastfeeding"></i>
+                    </div>
+                    <span class="module-badge rose">Maternal Legal</span>
+                </div>
+                <h3>Reposo Pre Natal y Postnatal</h3>
+                <p>Certificado obstétrico oficial para descanso pre y postparto según legislación laboral, FPP y semanas de gestación.</p>
+                <div class="module-card-footer rose">
+                    <span>Emitir Reposo Maternal</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- Historial de Reposos Emitidos -->
+        <section class="clinical-card fade-in-up">
+            <div class="clinical-card-header">
+                <h3 class="clinical-card-title">
+                    <span>Historial de Reposos Emitidos</span>
+                </h3>
+                <div class="search-bar-wrapper" style="margin: 0; min-width: 260px;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchLeavesInput" placeholder="Buscar por paciente o cédula...">
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="patient-table" id="tableLeavesHistory">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Paciente</th>
+                            <th>Cédula</th>
+                            <th>Tipo de Reposo</th>
+                            <th>Días / Tiempo</th>
+                            <th>Diagnóstico</th>
+                            <th style="text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leavesTableBody">
+                        <!-- Llenado dinámicamente con reposos.js -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/reposos.js?v=7.0"></script>
+</body>
+
+</html>

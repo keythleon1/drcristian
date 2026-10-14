@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Christian A. Rodríguez C. — Certificado de Reposo Pre y Postnatal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js -->
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css?v=7.0">
+
+    <style>
+        /* ==========================================================================
+           PALETA EXCLUSIVA: BLANCO PURO, AZUL CLÍNICO Y ROSA PASTEL SUTIL
+           DISEÑO EDITORIAL MÉDICO DE UNA SOLA PÁGINA (CARTA)
+           ========================================================================== */
+        :root {
+            --med-white: #ffffff;
+            --med-navy: #0f2b5c;
+            --med-blue: #0284c7;
+            --med-blue-soft: #f4f9ff;
+            --med-blue-border: #d8eafe;
+            --med-blush-soft: #fdf4f7;
+            --med-blush-border: #f5d6e0;
+            --med-blush-accent: #9f1239;
+            --med-slate-dark: #1e293b;
+            --med-slate-muted: #64748b;
+            --med-line: #e2e8f0;
+        }
+
+        body.dashboard-page {
+            background-color: #f4f7fb;
+        }
+
+        /* Hoja Clínica Tipo Documento Ejecutivo */
+        .executive-sheet {
+            background: var(--med-white);
+            border: 1px solid var(--med-blue-border);
+            border-radius: 14px;
+            padding: 32px 38px;
+            box-shadow: 0 10px 30px -10px rgba(15, 43, 92, 0.07);
+            max-width: 960px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Cinta superior sutil Azul Clínico -> Rosa Pastel */
+        .executive-sheet::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--med-navy) 0%, var(--med-blue) 55%, #f4b4c9 100%);
+        }
+
+        /* Membrete Médico Editorial: Conservado para PDF oficial, no exhibido en pantalla de trabajo */
+        .sheet-letterhead {
+            display: none !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 16px;
+            margin-bottom: 18px;
+            border-bottom: 1.5px solid var(--med-blue-border);
+        }
+
+        .pdf-rendering-active .sheet-letterhead,
+        body.pdf-rendering-active .sheet-letterhead {
+            display: flex !important;
+        }
+
+        @media print {
+            .sheet-letterhead {
+                display: flex !important;
+            }
+        }
+
+        .sheet-brand-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .sheet-logo-avatar {
+            width: 66px;
+            height: 66px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--med-blue-border);
+            padding: 2px;
+            background: var(--med-white);
+            flex-shrink: 0;
+        }
+
+        .sheet-doc-identity h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.38rem;
+            font-weight: 800;
+            color: var(--med-navy);
+            letter-spacing: -0.02em;
+            margin: 0 0 3px 0;
+        }
+
+        .sheet-doc-identity .credentials-bar {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--med-blue);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .sheet-doc-identity .contact-bar {
+            font-size: 0.76rem;
+            color: var(--med-slate-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sheet-title-pill {
+            background: linear-gradient(135deg, var(--med-blue-soft) 0%, var(--med-blush-soft) 100%);
+            border: 1px solid var(--med-blush-border);
+            padding: 10px 18px;
+            border-radius: 10px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .sheet-title-pill .doc-tag {
+            display: block;
+            font-size: 0.66rem;
+            font-weight: 700;
+            color: var(--med-blush-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 2px;
+        }
+
+        .sheet-title-pill h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--med-navy);
+            letter-spacing: 0.03em;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        /* Bloques Internos Minimalistas */
+        .sheet-section {
+            margin-bottom: 16px;
+        }
+
+        .sheet-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--med-line);
+        }
+
+        .sheet-section-title {
+            font-size: 0.84rem;
+            font-weight: 800;
+            color: var(--med-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .sheet-section-title i {
+            color: var(--med-blue);
+            font-size: 0.88rem;
+        }
+
+        .pill-soft-pink {
+            background: var(--med-blush-soft);
+            color: var(--med-blush-accent);
+            border: 1px solid var(--med-blush-border);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .pill-soft-blue {
+            background: var(--med-blue-soft);
+            color: var(--med-navy);
+            border: 1px solid var(--med-blue-border);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        /* Grilla Compacta de Campos */
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 10px 14px;
+        }
+
+        .s-col-12 { grid-column: span 12; }
+        .s-col-6 { grid-column: span 6; }
+        .s-col-5 { grid-column: span 5; }
+        .s-col-4 { grid-column: span 4; }
+        .s-col-3 { grid-column: span 3; }
+        .s-col-2 { grid-column: span 2; }
+
+        .sheet-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sheet-field label {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--med-slate-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .sheet-field input,
+        .sheet-field textarea {
+            background: #fbfdff;
+            border: 1px solid #d8e4f0;
+            border-radius: 8px;
+            padding: 8px 11px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--med-slate-dark);
+            transition: all 0.18s ease;
+            width: 100%;
+        }
+
+        .sheet-field input:focus,
+        .sheet-field textarea:focus {
+            background: var(--med-white);
+            border-color: var(--med-blue);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        }
+
+        /* Destacado sutil para FPP y Edad Gestacional */
+        .sheet-field.highlight-pink input {
+            background: var(--med-blush-soft);
+            border-color: var(--med-blush-border);
+            color: var(--med-blush-accent);
+            font-weight: 700;
+        }
+
+        .sheet-field.highlight-blue input {
+            background: var(--med-blue-soft);
+            border-color: var(--med-blue-border);
+            color: var(--med-navy);
+            font-weight: 700;
+        }
+
+        /* Cronograma Dual Lado a Lado (Sin verde ni colores estridentes) */
+        .maternity-schedule-dual {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 6px;
+        }
+
+        .schedule-card {
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Tarjeta Izquierda: Azul Clínico Suave */
+        .schedule-card.card-prenatal {
+            background: var(--med-blue-soft);
+            border: 1px solid var(--med-blue-border);
+        }
+
+        /* Tarjeta Derecha: Rosa Pastel Materno Sutil */
+        .schedule-card.card-postnatal {
+            background: var(--med-blush-soft);
+            border: 1px solid var(--med-blush-border);
+        }
+
+        .schedule-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(15, 43, 92, 0.08);
+        }
+
+        .schedule-card-head h4 {
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-prenatal .schedule-card-head h4 {
+            color: var(--med-navy);
+        }
+
+        .card-postnatal .schedule-card-head h4 {
+            color: var(--med-blush-accent);
+        }
+
+        .schedule-duration-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: var(--med-white);
+            color: var(--med-slate-dark);
+            border: 1px solid rgba(15, 43, 92, 0.1);
+        }
+
+        .schedule-dates-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .schedule-card .sheet-field input {
+            background: var(--med-white);
+        }
+
+        /* Barra Inferior de Reintegro Laboral */
+        .reintegro-banner {
+            margin-top: 12px;
+            background: linear-gradient(90deg, var(--med-blue-soft) 0%, var(--med-blush-soft) 100%);
+            border: 1px solid var(--med-blue-border);
+            border-radius: 10px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .reintegro-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reintegro-info i {
+            color: var(--med-blue);
+            font-size: 1.1rem;
+        }
+
+        .reintegro-info span {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--med-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .reintegro-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reintegro-input-group input[type="date"] {
+            background: var(--med-white);
+            border: 1px solid var(--med-blue);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--med-navy);
+            width: 170px;
+        }
+
+        /* Pie de Firma Editorial */
+        .sheet-footer {
+            margin-top: 22px;
+            padding-top: 14px;
+            border-top: 1px solid var(--med-line);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+        }
+
+        .sheet-legal-meta {
+            font-size: 0.74rem;
+            color: var(--med-slate-muted);
+            line-height: 1.45;
+        }
+
+        .sheet-legal-meta strong {
+            color: var(--med-navy);
+        }
+
+        .sheet-signature-box {
+            text-align: center;
+            min-width: 250px;
+        }
+
+        .sheet-signature-line {
+            border-top: 1.5px solid var(--med-navy);
+            width: 210px;
+            margin: 0 auto 5px auto;
+        }
+
+        .sheet-signature-name {
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: var(--med-navy);
+        }
+
+        .sheet-signature-sub {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--med-slate-muted);
+        }
+
+        @media (max-width: 768px) {
+            .executive-sheet {
+                padding: 20px 16px;
+            }
+            .sheet-letterhead {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .sheet-title-pill {
+                text-align: left;
+                width: 100%;
+            }
+            .maternity-schedule-dual {
+                grid-template-columns: 1fr;
+            }
+            .s-col-6, .s-col-5, .s-col-4, .s-col-3, .s-col-2 {
+                grid-column: span 12;
+            }
+        }
+
+        /* ==========================================================================
+           REGLAS ESTRICTAS DE IMPRESIÓN EN 1 SOLA PÁGINA CARTA (1/1)
+           ========================================================================== */
+        @page {
+            size: letter portrait;
+            margin: 0mm !important;
+        }
+
+        @media print {
+            body, body.dashboard-page {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .no-print,
+            .toast-notification,
+            .dashboard-header,
+            .top-action-bar {
+                display: none !important;
+            }
+
+            .page-container {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .executive-sheet {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 4px 2px !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                page-break-inside: avoid !important;
+            }
+
+            .executive-sheet::before {
+                display: none !important;
+            }
+
+            .sheet-letterhead {
+                padding-bottom: 8px !important;
+                margin-bottom: 10px !important;
+                border-bottom: 2px solid var(--med-navy) !important;
+            }
+
+            .sheet-section {
+                margin-bottom: 8px !important;
+                page-break-inside: avoid !important;
+            }
+
+            .sheet-grid {
+                grid-template-columns: repeat(12, 1fr) !important;
+                gap: 5px 8px !important;
+            }
+
+            .s-col-12 { grid-column: span 12 !important; }
+            .s-col-6 { grid-column: span 6 !important; }
+            .s-col-5 { grid-column: span 5 !important; }
+            .s-col-4 { grid-column: span 4 !important; }
+            .s-col-3 { grid-column: span 3 !important; }
+            .s-col-2 { grid-column: span 2 !important; }
+
+            .maternity-schedule-dual {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 8px !important;
+            }
+
+            .schedule-card {
+                padding: 8px 10px !important;
+            }
+
+            .sheet-field input,
+            .sheet-field textarea {
+                border: 1px solid #cbd5e1 !important;
+                padding: 4px 6px !important;
+                font-size: 0.80rem !important;
+                background: #ffffff !important;
+            }
+
+            .sheet-footer {
+                margin-top: 10px !important;
+                padding-top: 8px !important;
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+    <script>
+        if (sessionStorage.getItem('liteMedicSession') !== 'active') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <!-- Header del Sistema (No se imprime) -->
+    <header class="dashboard-header no-print">
+        <div class="header-brand">
+            <div class="header-logo-wrapper">
+                <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="header-logo">
+                <span class="logo-verified-badge" title="Especialista Certificado">
+                    <i class="fas fa-check"></i>
+                </span>
+            </div>
+            <div class="header-doctor-badge">
+                <span class="name">Dr. Christian A. Rodríguez C.</span>
+                <div class="doctor-sub-row">
+                    <span class="specialty">Ginecología y Obstetricia</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="doctor-info-bar">
+            <span class="sync-status-badge">
+                <span class="status-dot"></span> Sistema Activo
+            </span>
+
+            <a href="reposos.html" class="btn-action btn-action-secondary" title="Volver al Centro de Reposos">
+                <i class="fas fa-arrow-left"></i> Centro de Reposos
+            </a>
+
+            <button type="button" id="btnLogout" class="btn-logout-header" title="Cerrar sesión actual">
+                <i class="fas fa-arrow-right-from-bracket"></i> Salir
+            </button>
+        </div>
+    </header>
+
+    <div class="page-container">
+        
+        <!-- Barra de Herramientas Superior (No se imprime) -->
+        <div class="top-action-bar no-print">
+            <div class="top-bar-left">
+                <div class="breadcrumb-nav">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Inicio</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="reposos.html">Reposos</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Reposo Pre y Postnatal</span>
+                </div>
+
+                <div class="patient-quick-select">
+                    <i class="fas fa-search text-primary"></i>
+                    <select id="repPrePatientSelect" title="Cargar datos de la gestante">
+                        <option value="">-- Cargar Gestante --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="top-bar-buttons">
+                <button type="button" class="btn-wa-reminder-pill" id="btnSendRepPreWA" title="Enviar notificación y pautas del reposo por WhatsApp">
+                    <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+                </button>
+                <button type="button" class="btn-action-util" id="btnClearRepPre" title="Limpiar certificado">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </button>
+                <button type="button" class="btn-action-primary" id="btnDownloadRepPrePDF" title="Descargar certificado oficial en PDF">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button type="button" class="btn-action-save" id="btnSaveRepPre" title="Guardar reposo pre y postnatal">
+                    <i class="fas fa-floppy-disk"></i> Guardar Reposo
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             HOJA EJECUTIVA OFICIAL (DISEÑADA PARA CABER EN 1 SOLA PÁGINA CARTA)
+             ================================================================== -->
+        <div class="executive-sheet fade-in-up" id="printableCertificateSheet">
+            
+            <!-- Membrete Oficial Refinado -->
+            <div class="sheet-letterhead">
+                <div class="sheet-brand-left">
+                    <img src="images/0.jpeg" alt="Dr. Christian A. Rodríguez C." class="sheet-logo-avatar" onerror="this.style.display='none'">
+                    <div class="sheet-doc-identity">
+                        <h1>Dr. Christian A. Rodríguez C.</h1>
+                        <div class="credentials-bar">GINECOLOGÍA Y OBSTETRICIA &bull; MPPS: 96.430 &bull; CMG: 4232 &bull; RIF: V-18288931-4</div>
+                        <div class="contact-bar">
+                            <span>Teléfonos: 0414-5860575 / 0412-4770492</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sheet-title-pill">
+                    <h2>Reposo Pre y Postnatal</h2>
+                </div>
+            </div>
+
+            <form id="formReposoPrePost">
+                
+                <!-- 1. IDENTIFICACIÓN DE LA GESTANTE Y BIOMETRÍA OBSTÉTRICA -->
+                <div class="sheet-section">
+                    <div class="sheet-section-header">
+                        <h3 class="sheet-section-title">I. Identificación de la Paciente y Parámetros Obstétricos</h3>
+                    </div>
+
+                    <div class="sheet-grid">
+                        <div class="sheet-field s-col-6">
+                            <label>Nombre y Apellido de la Gestante *</label>
+                            <input type="text" id="rppNombre" required placeholder="Nombre y Apellido completo">
+                        </div>
+                        <div class="sheet-field s-col-3">
+                            <label>Cédula de Identidad *</label>
+                            <input type="text" id="rppCedula" required placeholder="V-00.000.000">
+                        </div>
+                        <div class="sheet-field s-col-3">
+                            <label>Edad</label>
+                            <input type="number" id="rppEdad" placeholder="Años">
+                        </div>
+
+                        <div class="sheet-field s-col-8">
+                            <label>Empresa / Institución / Entidad de Trabajo:</label>
+                            <input type="text" id="rppEmpresa" placeholder="A QUIEN PUEDA INTERESAR / IVSS / Razón social del empleador">
+                        </div>
+                        <div class="sheet-field s-col-4">
+                            <label>Fecha de Emisión *</label>
+                            <input type="date" id="rppFechaEmision" required>
+                        </div>
+
+                        <div class="sheet-field s-col-4">
+                            <label>F.U.R. (Fecha de Última Regla):</label>
+                            <input type="date" id="rppFUR">
+                        </div>
+                        <div class="sheet-field s-col-4 highlight-pink">
+                            <label>F.P.P. (Fecha Probable de Parto) *</label>
+                            <input type="date" id="rppFPP" required>
+                        </div>
+                        <div class="sheet-field s-col-4 highlight-blue">
+                            <label>Edad Gestacional Actual (E.G.):</label>
+                            <input type="text" id="rppEG" placeholder="Ej: 34 semanas + 0 días">
+                        </div>
+
+                        <div class="sheet-field s-col-12">
+                            <label>Diagnóstico Clínico Obstétrico *</label>
+                            <textarea id="rppDiagnostico" rows="2" required placeholder="Gestación simple activa de 34 semanas por FUR y biometría ecográfica. Feto único vivo en situación longitudinal, presentación cefálica."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. CRONOGRAMA LEGAL DE DESCANSO MATERNAL (DUAL LADO A LADO) -->
+                <div class="sheet-section">
+                    <div class="sheet-section-header">
+                        <h3 class="sheet-section-title">II. Cronograma Oficial de Licencia por Maternidad</h3>
+                    </div>
+
+                    <div class="maternity-schedule-dual">
+                        
+                        <!-- Tarjeta Izquierda: Período Prenatal (Azul Clínico Suave) -->
+                        <div class="schedule-card card-prenatal">
+                            <div class="schedule-card-head">
+                                <h4>1. Período Prenatal</h4>
+                                <span class="schedule-duration-badge" id="badgePreDuracion">06 Semanas (42 Días)</span>
+                            </div>
+
+                            <div class="schedule-dates-row">
+                                <div class="sheet-field">
+                                    <label>Fecha de Inicio (Desde):</label>
+                                    <input type="date" id="rppPreInicio" required>
+                                </div>
+                                <div class="sheet-field">
+                                    <label>Culminación (Hasta FPP):</label>
+                                    <input type="date" id="rppPreFin" required>
+                                </div>
+                            </div>
+
+                            <div class="sheet-field">
+                                <label>Duración Prenatal Certificada:</label>
+                                <input type="text" id="rppPreSemanas" value="SEIS (06) SEMANAS PREVIAS AL PARTO (42 DÍAS)">
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta Derecha: Período Postnatal (Rosa Pastel Materno Sutil) -->
+                        <div class="schedule-card card-postnatal">
+                            <div class="schedule-card-head">
+                                <h4>2. Período Postnatal</h4>
+                                <span class="schedule-duration-badge" id="badgePostDuracion">20 Semanas / 12 Semanas</span>
+                            </div>
+
+                            <div class="schedule-dates-row">
+                                <div class="sheet-field">
+                                    <label>Fecha de Inicio (Desde):</label>
+                                    <input type="date" id="rppPostInicio" required>
+                                </div>
+                                <div class="sheet-field">
+                                    <label>Fecha de Culminación (Hasta):</label>
+                                    <input type="date" id="rppPostFin" required>
+                                </div>
+                            </div>
+
+                            <div class="sheet-field">
+                                <label>Esquema Postnatal:</label>
+                                <select id="rppEsquemaPost" style="background:#ffffff; border:1px solid #d8e4f0; border-radius:8px; padding:7px 10px; font-size:0.84rem; font-weight:600; color:#1e293b;">
+                                    <option value="84">12 Semanas Postnatales (84 Días - IVSS Clásico)</option>
+                                    <option value="140">20 Semanas Postnatales (140 Días - LOTTT Art. 336)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Banner Unificado de Reintegro Laboral -->
+                    <div class="reintegro-banner">
+                        <div class="reintegro-info">
+                            <span>Fecha Estimada de Reintegro Laboral al Culminar el Descanso Postnatal:</span>
+                        </div>
+                        <div class="reintegro-input-group">
+                            <input type="date" id="rppReintegro" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. OBSERVACIONES MÉDICO-LEGALES -->
+                <div class="sheet-section" style="margin-bottom: 0;">
+                    <div class="sheet-field s-col-12">
+                        <label>III. Certificación y Observaciones Médico-Legales:</label>
+                        <textarea id="rppObservaciones" rows="2">Se expide la presente certificación médica de reposo prenatal y postnatal a solicitud de la parte interesada para los fines legales pertinentes y validación ante su empleador y el Instituto Venezolano de los Seguros Sociales (IVSS).</textarea>
+                    </div>
+                </div>
+
+            </form>
+
+            <!-- Firma del Médico Tratante -->
+            <div class="sheet-footer" style="justify-content: flex-end;">
+                <div class="sheet-signature-box">
+                    <div class="sheet-signature-line"></div>
+                    <div class="sheet-signature-name">Firma del Médico Tratante</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/doctor_logo_base64.js"></script>
+    <script src="js/clinical_db.js?v=7.0"></script>
+    <script src="js/reposo_prenatal_postnatal.js?v=7.0"></script>
+</body>
+
+</html>
